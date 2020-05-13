@@ -39,6 +39,18 @@ func (d *Device) Close() {
 	d.fd.Close()
 }
 
+func (d *Device) SetBrightness(pct int) {
+	if pct < 0 {
+		pct = 0
+	}
+	if pct > 100 {
+		pct = 100
+	}
+
+	payload := []byte{'\x03', '\x08', byte(pct)}
+	d.fd.SendFeatureReport(payload)
+}
+
 func (d *Device) ClearButtons() {
 	for i := 0; i < 32; i++ {
 		d.WriteColorToButton(0, 0, 0, i)
