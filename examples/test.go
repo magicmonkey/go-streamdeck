@@ -2,21 +2,19 @@ package main
 
 import (
 	"image/color"
-	"image/jpeg"
 	"os"
 
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 )
 
 func main() {
-	/*
-		sd := streamdeck.Open()
-		sd.ClearButtons()
+	sd := streamdeck.Open()
+	sd.ClearButtons()
 
-		sd.SetBrightness(50)
+	sd.SetBrightness(50)
 
-		sd.WriteTextToButton(2, "Hi Lorna!", color.RGBA{0, 0, 0, 255}, color.RGBA{0, 255, 255, 255})
-	*/
+	sd.WriteTextToButton(2, "Hi Lorna!", color.RGBA{0, 0, 0, 255}, color.RGBA{0, 255, 255, 255}, 18)
+
 	//sd.WriteImageToButton("test.jpg", 9)
 	//sd.WriteColorToButton(color.RGBA{255, 0, 255, 0}, 1)
 	/*
@@ -27,11 +25,12 @@ func main() {
 	*/
 
 	//streamdeck.ExampleDevice_WriteColorToButton()
-	img := streamdeck.GetImageWithText("Hello!", color.RGBA{255, 255, 255, 255}, color.RGBA{255, 0, 0, 100})
-	//fmt.Println(img)
-	newimg := streamdeck.ResizeAndRotate(img, 96, 96)
-	f, _ := createOrOpenFile("test.jpg")
-	jpeg.Encode(f, newimg, nil)
+	/*
+		img := streamdeck.GetImageWithText("Hello again!", color.RGBA{255, 255, 255, 255}, color.RGBA{255, 0, 0, 100}, 18)
+		newimg := streamdeck.ResizeAndRotate(img, 96, 96)
+		f, _ := createOrOpenFile("test.jpg")
+		jpeg.Encode(f, newimg, nil)
+	*/
 }
 
 func createOrOpenFile(fname string) (*os.File, error) {
