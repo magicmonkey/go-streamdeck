@@ -60,12 +60,12 @@ func (d *Device) SetBrightness(pct int) {
 // Writes a black square to all buttons
 func (d *Device) ClearButtons() {
 	for i := 0; i < 32; i++ {
-		d.WriteColorToButton(Black, i)
+		d.WriteColorToButton(i, Black)
 	}
 }
 
 // Writes a specified color to the given button
-func (d *Device) WriteColorToButton(colour color.Color, btnIndex int) {
+func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) {
 	img := getSolidColourImage(colour)
 	d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
 }
@@ -79,7 +79,7 @@ func getSolidColourImage(colour color.Color) *image.RGBA {
 }
 
 // Writes a specified JPEG file to the given button
-func (d *Device) WriteImageToButton(filename string, btnIndex int) error {
+func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
