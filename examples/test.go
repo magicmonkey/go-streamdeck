@@ -13,7 +13,9 @@ func main() {
 
 	sd.SetBrightness(50)
 
-	sd.WriteTextToButton(2, "Hi Lorna!", color.RGBA{0, 0, 0, 255}, color.RGBA{0, 255, 255, 255}, 18)
+	sd.WriteTextToButton(2, "Hi!", color.RGBA{0, 0, 0, 255}, color.RGBA{0, 255, 255, 255})
+	sd.WriteTextToButton(3, "Hi Lorna!", color.RGBA{0, 0, 0, 255}, color.RGBA{0, 255, 255, 255})
+	sd.WriteTextToButton(4, "Hi Lorna again!", color.RGBA{0, 0, 0, 255}, color.RGBA{0, 255, 255, 255})
 
 	//sd.WriteImageToButton("test.jpg", 9)
 	//sd.WriteColorToButton(color.RGBA{255, 0, 255, 0}, 1)

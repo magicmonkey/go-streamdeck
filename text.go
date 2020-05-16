@@ -1,7 +1,6 @@
 package streamdeck
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 
@@ -11,22 +10,29 @@ import (
 	"golang.org/x/image/font/gofont/gomedium"
 )
 
-func (d *Device) WriteTextToButton(btnIndex int, text string, textColour color.Color, backgroundColour color.Color, fontsize int) {
-	img := getImageWithText(text, textColour, backgroundColour, fontsize)
+func (d *Device) WriteTextToButton(btnIndex int, text string, textColour color.Color, backgroundColour color.Color) {
+	img := getImageWithText(text, textColour, backgroundColour)
 	d.writeToButton(btnIndex, img)
 }
 
-func getImageWithText(text string, textColour color.Color, backgroundColour color.Color, fontsize int) image.Image {
+func getImageWithText(text string, textColour color.Color, backgroundColour color.Color) image.Image {
 
-	size := float64(fontsize)
+	size := float64(18)
 
 	myfont, err := truetype.Parse(gomedium.TTF)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(textColour)
-	fmt.Println(backgroundColour)
+	width := 0
+	for size = 1; size < 60; size++ {
+		width = getTextWidth(text, size)
+		if width > 90 {
+			size = size - 1
+			break
+		}
+	}
+
 	src_img := image.NewUniform(textColour)
 	dst_img := getSolidColourImage(backgroundColour)
 
@@ -37,17 +43,8 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 	c.SetFontSize(size)
 	c.SetClip(dst_img.Bounds())
 
-	// Calculate width of string
-	width := 0
-	face := truetype.NewFace(myfont, &truetype.Options{Size: size})
-	for _, x := range text {
-		awidth, _ := face.GlyphAdvance(rune(x))
-		iwidthf := int(float64(awidth) / 64)
-		width += iwidthf
-	}
-
-	x := int((96 - width) / 2)
-	y := 50
+	x := int((96 - width) / 2) // Horizontally centre text
+	y := int(50 + (size / 3))  // Fudged vertical centre, erm, very "heuristic"
 
 	pt := freetype.Pt(x, y)
 	c.DrawString(text, pt)
@@ -65,4 +62,23 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 		f.DrawString(text)
 	*/
 	return dst_img
+}
+
+func getTextWidth(text string, size float64) int {
+
+	myfont, err := truetype.Parse(gomedium.TTF)
+	if err != nil {
+		panic(err)
+	}
+
+	// Calculate width of string
+	width := 0
+	face := truetype.NewFace(myfont, &truetype.Options{Size: size})
+	for _, x := range text {
+		awidth, _ := face.GlyphAdvance(rune(x))
+		iwidthf := int(float64(awidth) / 64)
+		width += iwidthf
+	}
+
+	return width
 }
