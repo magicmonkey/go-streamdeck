@@ -19,8 +19,19 @@ type Device struct {
 	fd *hid.Device
 }
 
-// Opens a new StreamdeckXL device, and returns a handle
 func Open() *Device {
+	d := rawOpen()
+	d.ResetComms()
+	return d
+}
+
+func OpenWithoutReset() *Device {
+	d := rawOpen()
+	return d
+}
+
+// Opens a new StreamdeckXL device, and returns a handle
+func rawOpen() *Device {
 	devices := hid.Enumerate(VendorID, ProductID)
 	if len(devices) == 0 {
 		panic("no stream deck device found")
@@ -32,6 +43,7 @@ func Open() *Device {
 	}
 	retval := &Device{}
 	retval.fd = dev
+	retval.ResetComms()
 	return retval
 }
 
@@ -101,6 +113,11 @@ func (d *Device) ButtonPress(f func(int, *Device)) {
 			}
 		}
 	}
+}
+
+func (d *Device) ResetComms() {
+	payload := []byte{'\x03', '\x02'}
+	d.fd.SendFeatureReport(payload)
 }
 
 func (d *Device) writeToButton(btnIndex int, raw_img image.Image) error {
