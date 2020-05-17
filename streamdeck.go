@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/jpeg"
-	"os"
 
 	"github.com/karalabe/hid"
 )
@@ -79,13 +77,9 @@ func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) {
 	d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
 }
 
-// Writes a specified JPEG file to the given button
+// Writes a specified image file to the given button
 func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	img, err := jpeg.Decode(f)
+	img, err := getImageFile(filename)
 	if err != nil {
 		return err
 	}

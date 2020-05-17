@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/draw"
 	"image/jpeg"
+	"os"
 
 	"github.com/disintegration/gift"
 )
@@ -33,4 +34,16 @@ func getSolidColourImage(colour color.Color) *image.RGBA {
 	//colour := color.RGBA{red, green, blue, 0}
 	draw.Draw(img, img.Bounds(), image.NewUniform(colour), image.Point{0, 0}, draw.Src)
 	return img
+}
+
+func getImageFile(filename string) (image.Image, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	img, err := jpeg.Decode(f)
+	if err != nil {
+		return nil, err
+	}
+	return img, nil
 }
