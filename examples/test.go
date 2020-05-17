@@ -3,6 +3,7 @@ package main
 import (
 	"image/color"
 	"os"
+	"sync"
 
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 )
@@ -20,12 +21,13 @@ func main() {
 	//sd.WriteImageToButton(9, "something.png")
 	//sd.WriteImageToButton(10, "play.jpg")
 	//sd.WriteColorToButton(color.RGBA{255, 0, 255, 0}, 1)
-	/*
-		sd.ButtonPress(func(btnIndex int, sd *streamdeck.Device) {
-			sd.ClearButtons()
-			sd.WriteImageToButton("play.jpg", btnIndex)
-		})
-	*/
+	sd.ButtonPress(func(btnIndex int, sd *streamdeck.Device, err error) {
+		if err != nil {
+			panic(err)
+		}
+		sd.ClearButtons()
+		sd.WriteImageToButton(btnIndex, "examples/play.jpg")
+	})
 
 	//streamdeck.ExampleDevice_WriteColorToButton()
 	/*
@@ -34,6 +36,9 @@ func main() {
 		f, _ := createOrOpenFile("test.jpg")
 		jpeg.Encode(f, newimg, nil)
 	*/
+	var wg sync.WaitGroup
+	wg.Add(1)
+	wg.Wait()
 }
 
 func createOrOpenFile(fname string) (*os.File, error) {

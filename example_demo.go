@@ -23,7 +23,7 @@ func ExampleDevice_WriteColorToButton() {
 func ExampleDevice_ButtonPress() {
 	sd := Open()
 	sd.ClearButtons()
-	sd.ButtonPress(func(btnIndex int, sd *Device) {
+	sd.ButtonPress(func(btnIndex int, sd *Device, err error) {
 		sd.ClearButtons()
 		sd.WriteImageToButton(btnIndex, "play.jpg")
 	})

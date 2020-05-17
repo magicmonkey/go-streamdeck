@@ -1,7 +1,6 @@
 package streamdeck
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 
@@ -14,22 +13,22 @@ const ProductID = 0x6c
 var Black = color.RGBA{0, 0, 0, 0}
 
 type Device struct {
-	fd *hid.Device
+	fd                   *hid.Device
+	buttonPressListeners []func(int, *Device, error)
 }
 
 func Open() *Device {
-	d := rawOpen()
-	d.ResetComms()
+	d := rawOpen(true)
 	return d
 }
 
 func OpenWithoutReset() *Device {
-	d := rawOpen()
+	d := rawOpen(false)
 	return d
 }
 
 // Opens a new StreamdeckXL device, and returns a handle
-func rawOpen() *Device {
+func rawOpen(reset bool) *Device {
 	devices := hid.Enumerate(VendorID, ProductID)
 	if len(devices) == 0 {
 		panic("no stream deck device found")
@@ -41,7 +40,10 @@ func rawOpen() *Device {
 	}
 	retval := &Device{}
 	retval.fd = dev
-	retval.ResetComms()
+	if reset {
+		retval.ResetComms()
+	}
+	go retval.buttonPressListener()
 	return retval
 }
 
@@ -87,19 +89,19 @@ func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
 	return nil
 }
 
-// Registers a callback to be called whenever a button is pressed
-func (d *Device) ButtonPress(f func(int, *Device)) {
+func (d *Device) buttonPressListener() {
 	var buttonMask [32]bool
 	for {
 		data := make([]byte, 50)
 		_, err := d.fd.Read(data)
 		if err != nil {
-			fmt.Println(err)
+			d.sendButtonPressEvent(-1, err)
+			break
 		}
 		for i := 0; i < 32; i++ {
 			if data[4+i] == 1 {
 				if !buttonMask[i] {
-					f(i, d)
+					d.sendButtonPressEvent(i, nil)
 				}
 				buttonMask[i] = true
 			} else {
@@ -107,6 +109,17 @@ func (d *Device) ButtonPress(f func(int, *Device)) {
 			}
 		}
 	}
+}
+
+func (d *Device) sendButtonPressEvent(btnIndex int, err error) {
+	for _, f := range d.buttonPressListeners {
+		f(btnIndex, d, err)
+	}
+}
+
+// Registers a callback to be called whenever a button is pressed
+func (d *Device) ButtonPress(f func(int, *Device, error)) {
+	d.buttonPressListeners = append(d.buttonPressListeners, f)
 }
 
 func (d *Device) ResetComms() {
