@@ -12,7 +12,10 @@ func main() {
 
 	sd.SetBrightness(50)
 
-	sd.ButtonPress(func(btnIndex int, sd *streamdeck.Device) {
+	sd.ButtonPress(func(btnIndex int, sd *streamdeck.Device, err error) {
+		if err != nil {
+			panic(err)
+		}
 		sd.ClearButtons()
 		sd.WriteImageToButton("play.jpg", btnIndex)
 	})
