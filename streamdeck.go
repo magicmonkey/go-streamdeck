@@ -70,14 +70,6 @@ func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) {
 	d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
 }
 
-func getSolidColourImage(colour color.Color) *image.RGBA {
-	ButtonSize := 96
-	img := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
-	//colour := color.RGBA{red, green, blue, 0}
-	draw.Draw(img, img.Bounds(), image.NewUniform(colour), image.Point{0, 0}, draw.Src)
-	return img
-}
-
 // Writes a specified JPEG file to the given button
 func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
 	f, err := os.Open(filename)
@@ -115,7 +107,7 @@ func (d *Device) ButtonPress(f func(int, *Device)) {
 }
 
 func (d *Device) writeToButton(btnIndex int, raw_img image.Image) error {
-	img := ResizeAndRotate(raw_img, 96, 96)
+	img := resizeAndRotate(raw_img, 96, 96)
 	return d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
 }
 
@@ -164,8 +156,7 @@ func (d *Device) rawWriteToButton(btnIndex int, raw_image []byte) error {
 	return nil
 }
 
-// TODO make private
-func ResizeAndRotate(img image.Image, width, height int) image.Image {
+func resizeAndRotate(img image.Image, width, height int) image.Image {
 	g := gift.New(
 		gift.Resize(width, height, gift.LanczosResampling),
 		//gift.UnsharpMask(1, 1, 0),
@@ -180,4 +171,12 @@ func getImageAsJpeg(img image.Image) []byte {
 	var b bytes.Buffer
 	jpeg.Encode(&b, img, nil)
 	return b.Bytes()
+}
+
+func getSolidColourImage(colour color.Color) *image.RGBA {
+	ButtonSize := 96
+	img := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
+	//colour := color.RGBA{red, green, blue, 0}
+	draw.Draw(img, img.Bounds(), image.NewUniform(colour), image.Point{0, 0}, draw.Src)
+	return img
 }
