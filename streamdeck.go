@@ -1,6 +1,7 @@
 package streamdeck
 
 import (
+	"errors"
 	"image"
 	"image/color"
 
@@ -17,26 +18,24 @@ type Device struct {
 	buttonPressListeners []func(int, *Device, error)
 }
 
-func Open() *Device {
-	d := rawOpen(true)
-	return d
+func Open() (*Device, error) {
+	return rawOpen(true)
 }
 
-func OpenWithoutReset() *Device {
-	d := rawOpen(false)
-	return d
+func OpenWithoutReset() (*Device, error) {
+	return rawOpen(false)
 }
 
 // Opens a new StreamdeckXL device, and returns a handle
-func rawOpen(reset bool) *Device {
+func rawOpen(reset bool) (*Device, error) {
 	devices := hid.Enumerate(VendorID, ProductID)
 	if len(devices) == 0 {
-		panic("no stream deck device found")
+		return nil, errors.New("no stream deck device found")
 	}
 	id := 0
 	dev, err := devices[id].Open()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	retval := &Device{}
 	retval.fd = dev
@@ -44,7 +43,7 @@ func rawOpen(reset bool) *Device {
 		retval.ResetComms()
 	}
 	go retval.buttonPressListener()
-	return retval
+	return retval, nil
 }
 
 // Closes the device

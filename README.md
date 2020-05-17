@@ -7,7 +7,10 @@ Example usage:
 import streamdeck "github.com/magicmonkey/go-streamdeck"
 
 func main() {
-	sd := streamdeck.Open()
+	sd, err := streamdeck.Open()
+	if err != nil {
+		panic(err)
+	}
 	sd.ClearButtons()
 
 	sd.SetBrightness(50)

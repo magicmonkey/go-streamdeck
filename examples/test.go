@@ -2,14 +2,16 @@ package main
 
 import (
 	"image/color"
-	"os"
 	"sync"
 
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 )
 
 func main() {
-	sd := streamdeck.Open()
+	sd, err := streamdeck.Open()
+	if err != nil {
+		panic(err)
+	}
 	sd.ClearButtons()
 
 	sd.SetBrightness(50)
@@ -29,23 +31,7 @@ func main() {
 		sd.WriteImageToButton(btnIndex, "examples/play.jpg")
 	})
 
-	//streamdeck.ExampleDevice_WriteColorToButton()
-	/*
-		img := streamdeck.GetImageWithText("Hello again!", color.RGBA{255, 255, 255, 255}, color.RGBA{255, 0, 0, 100}, 18)
-		newimg := streamdeck.ResizeAndRotate(img, 96, 96)
-		f, _ := createOrOpenFile("test.jpg")
-		jpeg.Encode(f, newimg, nil)
-	*/
 	var wg sync.WaitGroup
 	wg.Add(1)
 	wg.Wait()
-}
-
-func createOrOpenFile(fname string) (*os.File, error) {
-	os.Remove(fname)
-	f, err := os.Create(fname)
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
 }
