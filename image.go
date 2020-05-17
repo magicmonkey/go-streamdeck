@@ -5,7 +5,9 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	_ "image/gif"
 	"image/jpeg"
+	_ "image/png"
 	"os"
 
 	"github.com/disintegration/gift"
@@ -41,7 +43,7 @@ func getImageFile(filename string) (image.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	img, err := jpeg.Decode(f)
+	img, _, err := image.Decode(f)
 	if err != nil {
 		return nil, err
 	}
