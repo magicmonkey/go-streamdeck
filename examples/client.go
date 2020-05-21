@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	"time"
 
 	streamdeck "github.com/magicmonkey/go-streamdeck"
@@ -25,6 +26,12 @@ func main() {
 	myNextButton := buttons.NewTextButton("7")
 	myNextButton.SetActionHandler(&actionhandlers.TextLabelChange{NewLabel: "8"})
 	sd.AddButton(7, myNextButton)
+
+	anotherButton := buttons.NewImageFileButton("/home/kevin/streamdeck/go-streamdeck/examples/play.jpg")
+	sd.AddButton(9, anotherButton)
+
+	cButton := buttons.NewColourButton(color.RGBA{255, 255, 0, 255})
+	sd.AddButton(26, cButton)
 
 	time.Sleep(2 * time.Second)
 
