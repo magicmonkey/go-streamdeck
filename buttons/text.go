@@ -1,10 +1,14 @@
-package streamdeck
+package buttons
+
+import (
+	streamdeck "github.com/magicmonkey/go-streamdeck"
+)
 
 type TextButton struct {
 	label         string
-	updateHandler func(Button)
+	updateHandler func(streamdeck.Button)
 	btnIndex      int
-	actionHandler ButtonActionHandler
+	actionHandler streamdeck.ButtonActionHandler
 }
 
 func (tb *TextButton) GetButtonType() string {
@@ -32,11 +36,11 @@ func (tb *TextButton) SetText(label string) {
 	tb.updateHandler(tb)
 }
 
-func (tb *TextButton) RegisterUpdateHandler(f func(Button)) {
+func (tb *TextButton) RegisterUpdateHandler(f func(streamdeck.Button)) {
 	tb.updateHandler = f
 }
 
-func (tb *TextButton) SetActionHandler(a ButtonActionHandler) {
+func (tb *TextButton) SetActionHandler(a streamdeck.ButtonActionHandler) {
 	a.SetButton(tb)
 	tb.actionHandler = a
 }

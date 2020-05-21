@@ -5,6 +5,7 @@ import (
 
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 	"github.com/magicmonkey/go-streamdeck/actionhandlers"
+	"github.com/magicmonkey/go-streamdeck/buttons"
 )
 
 func main() {
@@ -13,12 +14,19 @@ func main() {
 		panic(err)
 	}
 
-	myButton := streamdeck.NewTextButton("Hi world")
+	myButton := buttons.NewTextButton("Hi world")
 	myButton.SetActionHandler(&actionhandlers.TextPrintAction{Label: "You pressed me"})
-
 	sd.AddButton(2, myButton)
 
-	time.Sleep(1 * time.Second)
+	myOtherButton := buttons.NewTextButton("4")
+	myOtherButton.SetActionHandler(&actionhandlers.NumberPrintAction{Number: 5})
+	sd.AddButton(3, myOtherButton)
+
+	myNextButton := buttons.NewTextButton("7")
+	myNextButton.SetActionHandler(&actionhandlers.TextLabelChange{NewLabel: "8"})
+	sd.AddButton(7, myNextButton)
+
+	time.Sleep(2 * time.Second)
 
 	myButton.SetText("Bye!")
 }
