@@ -4,6 +4,8 @@ A Go interface to an Elgato StreamdeckXL (specifically the 32-button version)
 
 There are 2 ways to use this: the low-level "comms-oriented" interface (using `streamdeck.Open`) which wraps the USB HID protocol, or the higher-level "button-oriented" interface (using `streamdeck.New`) which represents buttons and actions.
 
+If you want to implement your own actions, I suggest that you either instantiate a `CustomAction` or alternatively implement the `ButtonActionHandler` interface (basing your code on the `CustomerAction`).
+
 Example high-level usage:
 ```
 import (
