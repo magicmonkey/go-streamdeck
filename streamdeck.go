@@ -1,11 +1,9 @@
 package streamdeck
 
-import "image/color"
+import "image"
 
 type ButtonDisplay interface {
-	GetButtonType() string
-	GetImageFile() string
-	GetText() string
+	GetImageForButton() image.Image
 	GetButtonIndex() int
 	SetButtonIndex(int)
 	RegisterUpdateHandler(func(Button))
@@ -60,11 +58,8 @@ func (sd *StreamDeck) pressHandler(btnIndex int, d *Device, err error) {
 	}
 }
 
-func (sd *StreamDeck) updateButton(b Button) {
-	switch b.GetButtonType() {
-	case "text":
-		sd.dev.WriteTextToButton(b.GetButtonIndex(), b.GetText(), color.White, color.Black)
-	case "imagefile":
-		sd.dev.WriteImageToButton(b.GetButtonIndex(), b.GetImageFile())
-	}
+func (sd *StreamDeck) updateButton(b Button) error {
+	img := b.GetImageForButton()
+	e := sd.dev.WriteRawImageToButton(b.GetButtonIndex(), img)
+	return e
 }

@@ -12,7 +12,7 @@ import (
 
 func (d *Device) WriteTextToButton(btnIndex int, text string, textColour color.Color, backgroundColour color.Color) {
 	img := getImageWithText(text, textColour, backgroundColour)
-	d.writeToButton(btnIndex, img)
+	d.WriteRawImageToButton(btnIndex, img)
 }
 
 func getImageWithText(text string, textColour color.Color, backgroundColour color.Color) image.Image {

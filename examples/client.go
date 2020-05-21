@@ -33,7 +33,15 @@ func main() {
 	cButton := buttons.NewColourButton(color.RGBA{255, 255, 0, 255})
 	sd.AddButton(26, cButton)
 
+	multiActionButton := buttons.NewColourButton(color.RGBA{255, 0, 255, 255})
+	thisActionHandler := &actionhandlers.ChainedAction{}
+	thisActionHandler.AddAction(&actionhandlers.TextPrintAction{Label: "Purple press"})
+	thisActionHandler.AddAction(&actionhandlers.ColourChangeAction{NewColour: color.RGBA{255, 0, 0, 255}})
+	multiActionButton.SetActionHandler(thisActionHandler)
+	sd.AddButton(27, multiActionButton)
+
 	time.Sleep(2 * time.Second)
 
 	myButton.SetText("Bye!")
+	cButton.SetColour(color.RGBA{0, 255, 255, 255})
 }
