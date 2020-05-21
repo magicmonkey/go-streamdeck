@@ -6,7 +6,8 @@ import (
 )
 
 type TextPrintAction struct {
-	btn streamdeck.Button
+	Label string
+	btn   streamdeck.Button
 }
 
 func (tpa *TextPrintAction) SetButton(b streamdeck.Button) {
@@ -14,7 +15,7 @@ func (tpa *TextPrintAction) SetButton(b streamdeck.Button) {
 }
 
 func (tpa *TextPrintAction) Pressed() {
-	fmt.Println("I was pressed")
-	fmt.Println("I am:")
+	fmt.Println(tpa.Label)
+	fmt.Print("The button is: ")
 	fmt.Println(tpa.btn)
 }

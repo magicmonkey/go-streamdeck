@@ -13,12 +13,12 @@ func main() {
 		panic(err)
 	}
 
-	b1 := streamdeck.NewTextButton("Hi world")
-	b1.SetActionHandler(&actionhandlers.TextPrintAction{})
+	myButton := streamdeck.NewTextButton("Hi world")
+	myButton.SetActionHandler(&actionhandlers.TextPrintAction{Label: "You pressed me"})
 
-	sd.AddButton(2, b1)
+	sd.AddButton(2, myButton)
 
 	time.Sleep(1 * time.Second)
 
-	b1.SetText("Bye!")
+	myButton.SetText("Bye!")
 }
