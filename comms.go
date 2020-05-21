@@ -11,8 +11,6 @@ import (
 const VendorID = 4057
 const ProductID = 0x6c
 
-var Black = color.RGBA{0, 0, 0, 0}
-
 type Device struct {
 	fd                   *hid.Device
 	buttonPressListeners []func(int, *Device, error)
@@ -68,7 +66,7 @@ func (d *Device) SetBrightness(pct int) {
 // Writes a black square to all buttons
 func (d *Device) ClearButtons() {
 	for i := 0; i < 32; i++ {
-		d.WriteColorToButton(i, Black)
+		d.WriteColorToButton(i, color.Black)
 	}
 }
 
@@ -84,7 +82,7 @@ func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
 	if err != nil {
 		return err
 	}
-	d.writeToButton(btnIndex, img)
+	d.WriteRawImageToButton(btnIndex, img)
 	return nil
 }
 
@@ -126,7 +124,7 @@ func (d *Device) ResetComms() {
 	d.fd.SendFeatureReport(payload)
 }
 
-func (d *Device) writeToButton(btnIndex int, raw_img image.Image) error {
+func (d *Device) WriteRawImageToButton(btnIndex int, raw_img image.Image) error {
 	img := resizeAndRotate(raw_img, 96, 96)
 	return d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
 }
