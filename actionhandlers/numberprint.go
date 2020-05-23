@@ -12,3 +12,7 @@ type NumberPrintAction struct {
 func (npa *NumberPrintAction) Pressed(btn streamdeck.Button) {
 	fmt.Println(npa.Number)
 }
+
+func NewNumberPrintAction(number int) *NumberPrintAction {
+	return &NumberPrintAction{Number: number}
+}

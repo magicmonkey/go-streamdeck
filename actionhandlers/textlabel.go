@@ -13,3 +13,7 @@ func (action *TextLabelChange) Pressed(btn streamdeck.Button) {
 	mybtn := btn.(*buttons.TextButton)
 	mybtn.SetText(action.NewLabel)
 }
+
+func NewTextLabelChangeAction(newLabel string) *TextLabelChange {
+	return &TextLabelChange{NewLabel: newLabel}
+}

@@ -15,3 +15,11 @@ func (act *ChainedAction) Pressed(btn streamdeck.Button) {
 		a.Pressed(btn)
 	}
 }
+
+func NewEmptyChainedAction() *ChainedAction {
+	return &ChainedAction{}
+}
+
+func NewChainedAction(actions []streamdeck.ButtonActionHandler) *ChainedAction {
+	return &ChainedAction{actions: actions}
+}

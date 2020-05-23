@@ -14,3 +14,7 @@ func (action *TextPrintAction) Pressed(btn streamdeck.Button) {
 	fmt.Print("The button pressed is: ")
 	fmt.Println(btn)
 }
+
+func NewTextPrintAction(label string) *TextPrintAction {
+	return &TextPrintAction{Label: label}
+}
