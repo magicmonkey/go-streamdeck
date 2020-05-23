@@ -24,37 +24,36 @@ func (btn *TextButton) GetImageForButton() image.Image {
 	return img
 }
 
-func (tb *TextButton) SetButtonIndex(btnIndex int) {
-	tb.btnIndex = btnIndex
+func (btn *TextButton) SetButtonIndex(btnIndex int) {
+	btn.btnIndex = btnIndex
 }
 
-func (tb *TextButton) GetButtonIndex() int {
-	return tb.btnIndex
+func (btn *TextButton) GetButtonIndex() int {
+	return btn.btnIndex
 }
 
-func (tb *TextButton) SetText(label string) {
-	tb.label = label
-	tb.updateHandler(tb)
+func (btn *TextButton) SetText(label string) {
+	btn.label = label
+	btn.updateHandler(btn)
 }
 
-func (tb *TextButton) RegisterUpdateHandler(f func(streamdeck.Button)) {
-	tb.updateHandler = f
+func (btn *TextButton) RegisterUpdateHandler(f func(streamdeck.Button)) {
+	btn.updateHandler = f
 }
 
-func (tb *TextButton) SetActionHandler(a streamdeck.ButtonActionHandler) {
-	a.SetButton(tb)
-	tb.actionHandler = a
+func (btn *TextButton) SetActionHandler(a streamdeck.ButtonActionHandler) {
+	btn.actionHandler = a
 }
 
-func (tb *TextButton) Pressed() {
-	if tb.actionHandler != nil {
-		tb.actionHandler.Pressed()
+func (btn *TextButton) Pressed() {
+	if btn.actionHandler != nil {
+		btn.actionHandler.Pressed(btn)
 	}
 }
 
 func NewTextButton(label string) *TextButton {
-	tb := &TextButton{label: label}
-	return tb
+	btn := &TextButton{label: label}
+	return btn
 }
 
 func getImageWithText(text string, textColour color.Color, backgroundColour color.Color) image.Image {

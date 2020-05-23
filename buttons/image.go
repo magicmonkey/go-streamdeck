@@ -51,13 +51,12 @@ func (btn *ImageFileButton) RegisterUpdateHandler(f func(streamdeck.Button)) {
 }
 
 func (btn *ImageFileButton) SetActionHandler(a streamdeck.ButtonActionHandler) {
-	a.SetButton(btn)
 	btn.actionHandler = a
 }
 
 func (btn *ImageFileButton) Pressed() {
 	if btn.actionHandler != nil {
-		btn.actionHandler.Pressed()
+		btn.actionHandler.Pressed(btn)
 	}
 }
 

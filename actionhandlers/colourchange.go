@@ -9,13 +9,9 @@ import (
 
 type ColourChangeAction struct {
 	NewColour color.Color
-	btn       *buttons.ColourButton
 }
 
-func (action *ColourChangeAction) SetButton(b streamdeck.Button) {
-	action.btn = b.(*buttons.ColourButton)
-}
-
-func (action *ColourChangeAction) Pressed() {
-	action.btn.SetColour(action.NewColour)
+func (action *ColourChangeAction) Pressed(btn streamdeck.Button) {
+	mybtn := btn.(*buttons.ColourButton)
+	mybtn.SetColour(action.NewColour)
 }

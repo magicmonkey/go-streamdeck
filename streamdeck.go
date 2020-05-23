@@ -11,8 +11,7 @@ type ButtonDisplay interface {
 }
 
 type ButtonActionHandler interface {
-	SetButton(Button)
-	Pressed()
+	Pressed(Button)
 }
 
 type Button interface {

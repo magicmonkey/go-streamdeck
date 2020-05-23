@@ -7,13 +7,8 @@ import (
 
 type NumberPrintAction struct {
 	Number int
-	btn    streamdeck.Button
 }
 
-func (npa *NumberPrintAction) SetButton(b streamdeck.Button) {
-	npa.btn = b
-}
-
-func (npa *NumberPrintAction) Pressed() {
+func (npa *NumberPrintAction) Pressed(btn streamdeck.Button) {
 	fmt.Println(npa.Number)
 }

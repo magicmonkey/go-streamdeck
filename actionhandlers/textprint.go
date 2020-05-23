@@ -7,15 +7,10 @@ import (
 
 type TextPrintAction struct {
 	Label string
-	btn   streamdeck.Button
 }
 
-func (tpa *TextPrintAction) SetButton(b streamdeck.Button) {
-	tpa.btn = b
-}
-
-func (tpa *TextPrintAction) Pressed() {
-	fmt.Println(tpa.Label)
-	fmt.Print("The button is: ")
-	fmt.Println(tpa.btn)
+func (action *TextPrintAction) Pressed(btn streamdeck.Button) {
+	fmt.Println(action.Label)
+	fmt.Print("The button pressed is: ")
+	fmt.Println(btn)
 }

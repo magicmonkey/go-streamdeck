@@ -41,13 +41,12 @@ func (btn *ColourButton) RegisterUpdateHandler(f func(streamdeck.Button)) {
 }
 
 func (btn *ColourButton) SetActionHandler(a streamdeck.ButtonActionHandler) {
-	a.SetButton(btn)
 	btn.actionHandler = a
 }
 
 func (btn *ColourButton) Pressed() {
 	if btn.actionHandler != nil {
-		btn.actionHandler.Pressed()
+		btn.actionHandler.Pressed(btn)
 	}
 }
 

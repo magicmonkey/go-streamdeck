@@ -7,13 +7,9 @@ import (
 
 type TextLabelChange struct {
 	NewLabel string
-	btn      *buttons.TextButton
 }
 
-func (action *TextLabelChange) SetButton(b streamdeck.Button) {
-	action.btn = b.(*buttons.TextButton)
-}
-
-func (action *TextLabelChange) Pressed() {
-	action.btn.SetText("8")
+func (action *TextLabelChange) Pressed(btn streamdeck.Button) {
+	mybtn := btn.(*buttons.TextButton)
+	mybtn.SetText(action.NewLabel)
 }
