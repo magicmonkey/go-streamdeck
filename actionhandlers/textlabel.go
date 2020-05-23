@@ -5,7 +5,7 @@ import (
 	"github.com/magicmonkey/go-streamdeck/buttons"
 )
 
-type TextLabelChange struct {
+type TextLabelChangeAction struct {
 	NewLabel string
 }
 
