@@ -13,14 +13,16 @@ import (
 )
 
 type TextButton struct {
-	label         string
-	updateHandler func(streamdeck.Button)
-	btnIndex      int
-	actionHandler streamdeck.ButtonActionHandler
+	label            string
+	textColour       color.Color
+	backgroundColour color.Color
+	updateHandler    func(streamdeck.Button)
+	btnIndex         int
+	actionHandler    streamdeck.ButtonActionHandler
 }
 
 func (btn *TextButton) GetImageForButton() image.Image {
-	img := getImageWithText(btn.label, color.White, color.Black)
+	img := getImageWithText(btn.label, btn.textColour, btn.backgroundColour)
 	return img
 }
 
@@ -34,6 +36,16 @@ func (btn *TextButton) GetButtonIndex() int {
 
 func (btn *TextButton) SetText(label string) {
 	btn.label = label
+	btn.updateHandler(btn)
+}
+
+func (btn *TextButton) SetTextColour(textColour color.Color) {
+	btn.textColour = textColour
+	btn.updateHandler(btn)
+}
+
+func (btn *TextButton) SetBackgroundColor(backgroundColour color.Color) {
+	btn.backgroundColour = backgroundColour
 	btn.updateHandler(btn)
 }
 
@@ -52,7 +64,12 @@ func (btn *TextButton) Pressed() {
 }
 
 func NewTextButton(label string) *TextButton {
-	btn := &TextButton{label: label}
+	btn := NewTextButtonWithColours(label, color.White, color.Black)
+	return btn
+}
+
+func NewTextButtonWithColours(label string, textColour color.Color, backgroundColour color.Color) *TextButton {
+	btn := &TextButton{label: label, textColour: textColour, backgroundColour: backgroundColour}
 	return btn
 }
 
