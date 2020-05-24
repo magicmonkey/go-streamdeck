@@ -5,9 +5,9 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	_ "image/gif"
+	_ "image/gif" // Allow gifs to be loaded
 	"image/jpeg"
-	_ "image/png"
+	_ "image/png" // Allow pngs to be loaded
 	"os"
 
 	"github.com/disintegration/gift"

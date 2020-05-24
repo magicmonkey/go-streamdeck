@@ -10,6 +10,7 @@ import (
 	"golang.org/x/image/font/gofont/gomedium"
 )
 
+// WriteTextToButton is a low-level way to write text directly onto a button on the StreamDeck
 func (d *Device) WriteTextToButton(btnIndex int, text string, textColour color.Color, backgroundColour color.Color) {
 	img := getImageWithText(text, textColour, backgroundColour)
 	d.WriteRawImageToButton(btnIndex, img)
@@ -33,15 +34,15 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 		}
 	}
 
-	src_img := image.NewUniform(textColour)
-	dst_img := getSolidColourImage(backgroundColour)
+	srcImg := image.NewUniform(textColour)
+	dstImg := getSolidColourImage(backgroundColour)
 
 	c := freetype.NewContext()
 	c.SetFont(myfont)
-	c.SetDst(dst_img)
-	c.SetSrc(src_img)
+	c.SetDst(dstImg)
+	c.SetSrc(srcImg)
 	c.SetFontSize(size)
-	c.SetClip(dst_img.Bounds())
+	c.SetClip(dstImg.Bounds())
 
 	x := int((96 - width) / 2) // Horizontally centre text
 	y := int(50 + (size / 3))  // Fudged vertical centre, erm, very "heuristic"
@@ -54,14 +55,14 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 		fmt.Println(textWidth)
 
 		f := &font.Drawer{
-			Dst:  dst_img,
-			Src:  src_img,
+			Dst:  dstImg,
+			Src:  srcImg,
 			Face: basicfont.Face7x13,
 			Dot:  fixed.Point26_6{fixed.Int26_6(x * 64), fixed.Int26_6(y * 64)},
 		}
 		f.DrawString(text)
 	*/
-	return dst_img
+	return dstImg
 }
 
 func getTextWidth(text string, size float64) int {

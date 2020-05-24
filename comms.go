@@ -8,25 +8,28 @@ import (
 	"github.com/karalabe/hid"
 )
 
-const VendorID = 4057
-const ProductID = 0x6c
+const vendorID = 4057
+const productID = 0x6c
 
+// Device is a struct which represents an actual Streamdeck device, and holds its reference to the USB HID device
 type Device struct {
 	fd                   *hid.Device
 	buttonPressListeners []func(int, *Device, error)
 }
 
+// Open a Streamdeck device, the most common entry point
 func Open() (*Device, error) {
 	return rawOpen(true)
 }
 
+// OpenWithoutReset will open a Streamdeck device, without resetting it
 func OpenWithoutReset() (*Device, error) {
 	return rawOpen(false)
 }
 
 // Opens a new StreamdeckXL device, and returns a handle
 func rawOpen(reset bool) (*Device, error) {
-	devices := hid.Enumerate(VendorID, ProductID)
+	devices := hid.Enumerate(vendorID, productID)
 	if len(devices) == 0 {
 		return nil, errors.New("no stream deck device found")
 	}
@@ -44,12 +47,12 @@ func rawOpen(reset bool) (*Device, error) {
 	return retval, nil
 }
 
-// Closes the device
+// Close the device
 func (d *Device) Close() {
 	d.fd.Close()
 }
 
-// Sets the button brightness
+// SetBrightness sets the button brightness
 // pct is an integer between 0-100
 func (d *Device) SetBrightness(pct int) {
 	if pct < 0 {
@@ -63,20 +66,20 @@ func (d *Device) SetBrightness(pct int) {
 	d.fd.SendFeatureReport(payload)
 }
 
-// Writes a black square to all buttons
+// ClearButtons writes a black square to all buttons
 func (d *Device) ClearButtons() {
 	for i := 0; i < 32; i++ {
 		d.WriteColorToButton(i, color.Black)
 	}
 }
 
-// Writes a specified color to the given button
+// WriteColorToButton writes a specified color to the given button
 func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) {
 	img := getSolidColourImage(colour)
 	d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
 }
 
-// Writes a specified image file to the given button
+// WriteImageToButton writes a specified image file to the given button
 func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
 	img, err := getImageFile(filename)
 	if err != nil {
@@ -114,64 +117,66 @@ func (d *Device) sendButtonPressEvent(btnIndex int, err error) {
 	}
 }
 
-// Registers a callback to be called whenever a button is pressed
+// ButtonPress registers a callback to be called whenever a button is pressed
 func (d *Device) ButtonPress(f func(int, *Device, error)) {
 	d.buttonPressListeners = append(d.buttonPressListeners, f)
 }
 
+// ResetComms will reset the comms protocol to the StreamDeck; useful if things have gotten de-synced, but it will also reboot the StreamDeck
 func (d *Device) ResetComms() {
 	payload := []byte{'\x03', '\x02'}
 	d.fd.SendFeatureReport(payload)
 }
 
-func (d *Device) WriteRawImageToButton(btnIndex int, raw_img image.Image) error {
-	img := resizeAndRotate(raw_img, 96, 96)
+// WriteRawImageToButton takes an `image.Image` and writes it to the given button, after resizing and rotating the image to fit the button (for some reason the StreamDeck screens are all upside down)
+func (d *Device) WriteRawImageToButton(btnIndex int, rawImg image.Image) error {
+	img := resizeAndRotate(rawImg, 96, 96)
 	return d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
 }
 
-func (d *Device) rawWriteToButton(btnIndex int, raw_image []byte) error {
+func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 	// Based on set_key_image from https://github.com/abcminiuser/python-elgato-streamdeck/blob/master/src/StreamDeck/Devices/StreamDeckXL.py#L151
-	page_number := 0
-	bytes_remaining := len(raw_image)
+	pageNumber := 0
+	bytesRemaining := len(rawImage)
 
-	IMAGE_REPORT_LENGTH := 1024
-	IMAGE_REPORT_HEADER_LENGTH := 8
-	IMAGE_REPORT_PAYLOAD_LENGTH := IMAGE_REPORT_LENGTH - IMAGE_REPORT_HEADER_LENGTH
+	imageReportLength := 1024
+	imageReportHeaderLength := 8
+	imageReportPayloadLength := imageReportLength - imageReportHeaderLength
 
 	// Surely no image can be more than 20 packets...?
 	payloads := make([][]byte, 20)
 
-	for bytes_remaining > 0 {
-		this_length := 0
-		if IMAGE_REPORT_PAYLOAD_LENGTH < bytes_remaining {
-			this_length = IMAGE_REPORT_PAYLOAD_LENGTH
+	for bytesRemaining > 0 {
+		thisLength := 0
+		if imageReportPayloadLength < bytesRemaining {
+			thisLength = imageReportPayloadLength
 		} else {
-			this_length = bytes_remaining
+			thisLength = bytesRemaining
 		}
-		bytes_sent := page_number * IMAGE_REPORT_PAYLOAD_LENGTH
+		bytesSent := pageNumber * imageReportPayloadLength
 		header := []byte{'\x02', '\x07', byte(btnIndex)}
-		if this_length == bytes_remaining {
+		if thisLength == bytesRemaining {
 			header = append(header, '\x01')
 		} else {
 			header = append(header, '\x00')
 		}
 
-		header = append(header, byte(this_length&0xff))
-		header = append(header, byte(this_length>>8))
+		header = append(header, byte(thisLength&0xff))
+		header = append(header, byte(thisLength>>8))
 
-		header = append(header, byte(page_number&0xff))
-		header = append(header, byte(page_number>>8))
+		header = append(header, byte(pageNumber&0xff))
+		header = append(header, byte(pageNumber>>8))
 
-		payload := append(header, raw_image[bytes_sent:(bytes_sent+this_length)]...)
-		padding := make([]byte, IMAGE_REPORT_LENGTH-len(payload))
+		payload := append(header, rawImage[bytesSent:(bytesSent+thisLength)]...)
+		padding := make([]byte, imageReportLength-len(payload))
 
 		thingToSend := append(payload, padding...)
 		d.fd.Write(thingToSend)
-		payloads[page_number] = thingToSend
+		payloads[pageNumber] = thingToSend
 
-		bytes_remaining = bytes_remaining - this_length
-		page_number = page_number + 1
-		if page_number >= len(payloads) {
+		bytesRemaining = bytesRemaining - thisLength
+		pageNumber = pageNumber + 1
+		if pageNumber >= len(payloads) {
 			return errors.New("Image too big for button, aborting.  You probably need to reset the Streamdeck at this stage, and modify the size of `payloads` on line 142 to be something bigger.")
 		}
 	}
