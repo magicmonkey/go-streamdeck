@@ -138,7 +138,8 @@ func (d *Device) rawWriteToButton(btnIndex int, raw_image []byte) error {
 	IMAGE_REPORT_HEADER_LENGTH := 8
 	IMAGE_REPORT_PAYLOAD_LENGTH := IMAGE_REPORT_LENGTH - IMAGE_REPORT_HEADER_LENGTH
 
-	payloads := make([][]byte, 3)
+	// Surely no image can be more than 20 packets...?
+	payloads := make([][]byte, 20)
 
 	for bytes_remaining > 0 {
 		this_length := 0
@@ -170,6 +171,9 @@ func (d *Device) rawWriteToButton(btnIndex int, raw_image []byte) error {
 
 		bytes_remaining = bytes_remaining - this_length
 		page_number = page_number + 1
+		if page_number >= len(payloads) {
+			return errors.New("Image too big for button, aborting.  You probably need to reset the Streamdeck at this stage, and modify the size of `payloads` on line 142 to be something bigger.")
+		}
 	}
 	return nil
 }
