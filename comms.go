@@ -14,6 +14,7 @@ const ProductID = 0x6c
 type Device struct {
 	fd                   *hid.Device
 	buttonPressListeners []func(int, *Device, error)
+	mutex                sync.Mutex
 }
 
 func Open() (*Device, error) {
@@ -130,6 +131,7 @@ func (d *Device) WriteRawImageToButton(btnIndex int, raw_img image.Image) error 
 }
 
 func (d *Device) rawWriteToButton(btnIndex int, raw_image []byte) error {
+	d.mutex.Lock()
 	// Based on set_key_image from https://github.com/abcminiuser/python-elgato-streamdeck/blob/master/src/StreamDeck/Devices/StreamDeckXL.py#L151
 	page_number := 0
 	bytes_remaining := len(raw_image)
@@ -171,5 +173,6 @@ func (d *Device) rawWriteToButton(btnIndex int, raw_image []byte) error {
 		bytes_remaining = bytes_remaining - this_length
 		page_number = page_number + 1
 	}
+	d.mutex.Unlock()
 	return nil
 }
