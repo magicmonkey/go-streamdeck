@@ -7,7 +7,7 @@ There are 2 ways to use this: the low-level "comms-oriented" interface (using `s
 If you want to implement your own actions, I suggest that you either instantiate a `CustomAction` or alternatively implement the `ButtonActionHandler` interface (basing your code on the `CustomerAction`).
 
 Example high-level usage:
-```
+```go
 import (
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 	"github.com/magicmonkey/go-streamdeck/actionhandlers"
@@ -47,7 +47,7 @@ func main() {
 ```
 
 Example low-level usage:
-```
+```go
 import streamdeck "github.com/magicmonkey/go-streamdeck"
 
 func main() {
