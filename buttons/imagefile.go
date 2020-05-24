@@ -27,10 +27,14 @@ func (btn *ImageFileButton) GetButtonIndex() int {
 	return btn.btnIndex
 }
 
-func (btn *ImageFileButton) SetFilePath(filePath string) {
+func (btn *ImageFileButton) SetFilePath(filePath string) error {
 	btn.filePath = filePath
-	btn.loadImage()
+	err := btn.loadImage()
+	if err != nil {
+		return err
+	}
 	btn.updateHandler(btn)
+	return nil
 }
 
 func (btn *ImageFileButton) loadImage() error {
@@ -60,8 +64,11 @@ func (btn *ImageFileButton) Pressed() {
 	}
 }
 
-func NewImageFileButton(filePath string) *ImageFileButton {
+func NewImageFileButton(filePath string) (*ImageFileButton, error) {
 	btn := &ImageFileButton{filePath: filePath}
-	btn.loadImage()
-	return btn
+	err := btn.loadImage()
+	if err != nil {
+		return nil, err
+	}
+	return btn, nil
 }
