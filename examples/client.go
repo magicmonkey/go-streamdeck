@@ -24,7 +24,7 @@ func main() {
 	sd.AddButton(3, myOtherButton)
 
 	myNextButton := buttons.NewTextButton("7")
-	myNextButton.SetActionHandler(&actionhandlers.TextLabelChange{NewLabel: "8"})
+	myNextButton.SetActionHandler(&actionhandlers.TextLabelChangeAction{NewLabel: "8"})
 	sd.AddButton(7, myNextButton)
 
 	anotherButton := buttons.NewImageFileButton("/home/kevin/streamdeck/go-streamdeck/examples/play.jpg")
