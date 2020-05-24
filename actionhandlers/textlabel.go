@@ -5,15 +5,15 @@ import (
 	"github.com/magicmonkey/go-streamdeck/buttons"
 )
 
-type TextLabelChange struct {
+type TextLabelChangeAction struct {
 	NewLabel string
 }
 
-func (action *TextLabelChange) Pressed(btn streamdeck.Button) {
+func (action *TextLabelChangeAction) Pressed(btn streamdeck.Button) {
 	mybtn := btn.(*buttons.TextButton)
 	mybtn.SetText(action.NewLabel)
 }
 
-func NewTextLabelChangeAction(newLabel string) *TextLabelChange {
-	return &TextLabelChange{NewLabel: newLabel}
+func NewTextLabelChangeAction(newLabel string) *TextLabelChangeAction {
+	return &TextLabelChangeAction{NewLabel: newLabel}
 }
