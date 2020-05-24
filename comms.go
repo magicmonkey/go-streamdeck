@@ -4,6 +4,7 @@ import (
 	"errors"
 	"image"
 	"image/color"
+	"sync"
 
 	"github.com/karalabe/hid"
 )
@@ -59,6 +60,7 @@ type Device struct {
 	fd                   *hid.Device
 	deviceType           deviceType
 	buttonPressListeners []func(int, *Device, error)
+	mutex                sync.Mutex
 }
 
 // Open a Streamdeck device, the most common entry point
@@ -244,5 +246,6 @@ func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 			return errors.New("Image too big for button comms, aborting - you probably need to reset the Streamdeck at this stage, and modify the size of `payloads` on line 142 to be something bigger")
 		}
 	}
+	d.mutex.Unlock()
 	return nil
 }
