@@ -21,10 +21,15 @@ type Button interface {
 	ButtonDisplay
 }
 
+type ButtonDecorator interface {
+	Apply(image.Image) image.Image
+}
+
 // StreamDeck is the main struct to represent a StreamDeck device, and internally contains the reference to a `Device`
 type StreamDeck struct {
-	dev     *Device
-	buttons map[int]Button
+	dev        *Device
+	buttons    map[int]Button
+	decorators map[int]ButtonDecorator
 }
 
 // New will return a new instance of a `StreamDeck`, and is the main entry point for the higher-level interface.  It will return an error if there is no StreamDeck plugged in.
@@ -36,6 +41,7 @@ func New() (*StreamDeck, error) {
 	}
 	sd.dev = d
 	sd.buttons = make(map[int]Button)
+	sd.decorators = make(map[int]ButtonDecorator)
 	sd.dev.ButtonPress(sd.pressHandler)
 	return sd, nil
 }
@@ -46,6 +52,15 @@ func (sd *StreamDeck) AddButton(btnIndex int, b Button) {
 	b.SetButtonIndex(btnIndex)
 	sd.buttons[btnIndex] = b
 	sd.updateButton(b)
+}
+
+func (sd *StreamDeck) SetDecorator(btnIndex int, d ButtonDecorator) {
+	sd.decorators[btnIndex] = d
+	// If there's a button there, update it
+	btn, ok := sd.buttons[btnIndex]
+	if ok {
+		sd.updateButton(btn)
+	}
 }
 
 // ButtonUpdateHandler allows a user of this library to signal when something external has changed, such that this button should be update
@@ -66,6 +81,10 @@ func (sd *StreamDeck) pressHandler(btnIndex int, d *Device, err error) {
 
 func (sd *StreamDeck) updateButton(b Button) error {
 	img := b.GetImageForButton()
+	decorator, ok := sd.decorators[b.GetButtonIndex()]
+	if ok {
+		img = decorator.Apply(img)
+	}
 	e := sd.dev.WriteRawImageToButton(b.GetButtonIndex(), img)
 	return e
 }
