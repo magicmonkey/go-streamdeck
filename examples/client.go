@@ -7,6 +7,7 @@ import (
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 	"github.com/magicmonkey/go-streamdeck/actionhandlers"
 	"github.com/magicmonkey/go-streamdeck/buttons"
+	"github.com/magicmonkey/go-streamdeck/decorators"
 )
 
 func main() {
@@ -39,6 +40,16 @@ func main() {
 	thisActionHandler.AddAction(&actionhandlers.ColourChangeAction{NewColour: color.RGBA{255, 0, 0, 255}})
 	multiActionButton.SetActionHandler(thisActionHandler)
 	sd.AddButton(27, multiActionButton)
+
+	decoratedButton := buttons.NewTextButton("ABC")
+	sd.AddButton(19, decoratedButton)
+
+	time.Sleep(2 * time.Second)
+	decorator1 := decorators.NewBorder(10, color.RGBA{0, 255, 0, 255})
+	sd.SetDecorator(19, decorator1)
+	time.Sleep(2 * time.Second)
+	decorator2 := decorators.NewBorder(5, color.RGBA{255, 0, 0, 255})
+	sd.SetDecorator(19, decorator2)
 
 	time.Sleep(2 * time.Second)
 
