@@ -1,14 +1,42 @@
-A Go interface to an Elgato StreamdeckXL (specifically the 32-button version)
+# Go Streamdeck
+
+A Go interface to an Elgato Streamdeck.
 
 [![GoDoc](https://godoc.org/github.com/magicmonkey/go-streamdeck?status.svg)](https://godoc.org/github.com/magicmonkey/go-streamdeck)
+
+_Designed for and tested with Ubuntu, Go 1.13+ and a Streamdeck XL. Images are probably the wrong size for other streamdecks; bug reports and patches are welcome!_
+
+## Installation
+
+Either include the library in your project or install it with the following command:
+
+```
+go get github.com/magicmonkey/go-streamdeck
+```
+
+## Usage
 
 There are 2 ways to use this: the low-level "comms-oriented" interface (using `streamdeck.Open`) which wraps the USB HID protocol, or the higher-level "button-oriented" interface (using `streamdeck.New`) which represents buttons and actions.
 
 If you want to implement your own actions, I suggest that you either instantiate a `CustomAction` or alternatively implement the `ButtonActionHandler` interface (basing your code on the `CustomerAction`).
 
-Example high-level usage:
+### Example high-level usage
+
+High level usage gives some helpers to set up buttons. This example has a few things to look at:
+
+* A button in position 2 that says "Hi world" and prints to the console when pressed
+
+* A button in position 7 displaying the number 7 - changes to number 8 when pressed.
+
+* A yellow button in position 26
+
+* A purple button in position 27, it changes colour _and_ prints to the console when pressed.
+
 ```go
 import (
+	"image/color"
+	"time"
+
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 	"github.com/magicmonkey/go-streamdeck/actionhandlers"
 	"github.com/magicmonkey/go-streamdeck/buttons"
@@ -31,7 +59,7 @@ func main() {
 
 	// A button with text on it which changes when pressed
 	myNextButton := buttons.NewTextButton("7")
-	myNextButton.SetActionHandler(&actionhandlers.TextLabelChange{NewLabel: "8"})
+	myNextButton.SetActionHandler(&actionhandlers.TextLabelChangeAction{NewLabel: "8"})
 	sd.AddButton(7, myNextButton)
 
 	// A button which performs multiple actions when pressed
@@ -46,7 +74,14 @@ func main() {
 }
 ```
 
-Example low-level usage:
+The program runs for 20 seconds and then exits.
+
+### Example low-level usage
+
+The low-level usage gives more control over the operations of the streamdeck and buttons.
+
+This example shows an image on any pressed button, updating each time another button is pressed.
+
 ```go
 import streamdeck "github.com/magicmonkey/go-streamdeck"
 
@@ -66,5 +101,14 @@ func main() {
 		sd.ClearButtons()
 		sd.WriteImageToButton("play.jpg", btnIndex)
 	})
+
+	time.Sleep(20 * time.Second)
+
 }
 ```
+
+The program runs for 20 seconds and then exits.
+
+## Contributions
+
+This is a very new project but all feedback, comments, questions and patches are more than welcome. Please get in touch by opening an issue, it would be good to hear who is using the project and how things are going.
