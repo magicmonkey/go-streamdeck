@@ -1,10 +1,10 @@
 # Go Streamdeck
 
-A Go interface to an Elgato Streamdeck.
+A Go interface to an Elgato Streamdeck (currently works with the 32-button XL only because that's what I have).
 
 [![GoDoc](https://godoc.org/github.com/magicmonkey/go-streamdeck?status.svg)](https://godoc.org/github.com/magicmonkey/go-streamdeck)
 
-_Designed for and tested with Ubuntu, Go 1.13+ and a Streamdeck XL. Images are probably the wrong size for other streamdecks; bug reports and patches are welcome!_
+_Designed for and tested with Ubuntu, Go 1.13+ and a Streamdeck XL. Images are the wrong size for other streamdecks; bug reports and patches are welcome!_
 
 ## Installation
 
