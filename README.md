@@ -18,7 +18,7 @@ go get github.com/magicmonkey/go-streamdeck
 
 There are 2 ways to use this: the low-level "comms-oriented" interface (using `streamdeck.Open`) which wraps the USB HID protocol, or the higher-level "button-oriented" interface (using `streamdeck.New`) which represents buttons and actions.
 
-If you want to implement your own actions, I suggest that you either instantiate a `CustomAction` or alternatively implement the `ButtonActionHandler` interface (basing your code on the `CustomerAction`).
+If you want to implement your own actions, I suggest that you either instantiate a `CustomAction` or alternatively implement the `ButtonActionHandler` interface (basing your code on the `CustomAction`).
 
 ### Example high-level usage
 
