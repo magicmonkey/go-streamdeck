@@ -8,12 +8,41 @@ import (
 	"github.com/karalabe/hid"
 )
 
-const vendorID = 4057
-const productID = 0x6c
+const vendorID = 0x0fd9
+
+// deviceType represents one of the various types of StreamDeck (mini/orig/orig2/xl)
+type deviceType struct {
+	name            string
+	imageSize       image.Point
+	usbProductID    uint16
+	resetPacket     []byte
+	numberOfButtons uint
+}
+
+var deviceTypes []deviceType
+
+// RegisterDevicetype allows the declaration of a new type of device, intended for use by subpackage "devices"
+func RegisterDevicetype(
+	name string,
+	imageSize image.Point,
+	usbProductID uint16,
+	resetPacket []byte,
+	numberOfButtons uint,
+) {
+	d := deviceType{
+		name:            name,
+		imageSize:       imageSize,
+		usbProductID:    usbProductID,
+		resetPacket:     resetPacket,
+		numberOfButtons: numberOfButtons,
+	}
+	deviceTypes = append(deviceTypes, d)
+}
 
 // Device is a struct which represents an actual Streamdeck device, and holds its reference to the USB HID device
 type Device struct {
 	fd                   *hid.Device
+	deviceType           deviceType
 	buttonPressListeners []func(int, *Device, error)
 }
 
@@ -29,16 +58,23 @@ func OpenWithoutReset() (*Device, error) {
 
 // Opens a new StreamdeckXL device, and returns a handle
 func rawOpen(reset bool) (*Device, error) {
-	devices := hid.Enumerate(vendorID, productID)
+	devices := hid.Enumerate(vendorID, 0)
 	if len(devices) == 0 {
-		return nil, errors.New("no stream deck device found")
+		return nil, errors.New("No elgato devices found")
 	}
+
+	retval := &Device{}
 	id := 0
+	// Iterate over the known device types, matching to product ID
+	for _, devType := range deviceTypes {
+		if devices[id].ProductID == devType.usbProductID {
+			retval.deviceType = devType
+		}
+	}
 	dev, err := devices[id].Open()
 	if err != nil {
 		return nil, err
 	}
-	retval := &Device{}
 	retval.fd = dev
 	if reset {
 		retval.ResetComms()

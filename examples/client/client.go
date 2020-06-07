@@ -8,6 +8,7 @@ import (
 	"github.com/magicmonkey/go-streamdeck/actionhandlers"
 	"github.com/magicmonkey/go-streamdeck/buttons"
 	"github.com/magicmonkey/go-streamdeck/decorators"
+	_ "github.com/magicmonkey/go-streamdeck/devices"
 )
 
 func main() {
