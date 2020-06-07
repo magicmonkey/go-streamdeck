@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"sync"
 
 	streamdeck "github.com/magicmonkey/go-streamdeck"
+	_ "github.com/magicmonkey/go-streamdeck/devices"
 )
 
 func main() {
@@ -12,6 +14,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("Found device [%s]\n", sd.GetName())
+
 	sd.ClearButtons()
 
 	sd.SetBrightness(50)

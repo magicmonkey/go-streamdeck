@@ -83,6 +83,11 @@ func rawOpen(reset bool) (*Device, error) {
 	return retval, nil
 }
 
+// GetName returns the name of the type of Streamdeck
+func (d *Device) GetName() string {
+	return d.deviceType.name
+}
+
 // Close the device
 func (d *Device) Close() {
 	d.fd.Close()
@@ -160,7 +165,7 @@ func (d *Device) ButtonPress(f func(int, *Device, error)) {
 
 // ResetComms will reset the comms protocol to the StreamDeck; useful if things have gotten de-synced, but it will also reboot the StreamDeck
 func (d *Device) ResetComms() {
-	payload := []byte{'\x03', '\x02'}
+	payload := d.deviceType.resetPacket
 	d.fd.SendFeatureReport(payload)
 }
 
@@ -213,7 +218,7 @@ func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 		bytesRemaining = bytesRemaining - thisLength
 		pageNumber = pageNumber + 1
 		if pageNumber >= len(payloads) {
-			return errors.New("Image too big for button, aborting.  You probably need to reset the Streamdeck at this stage, and modify the size of `payloads` on line 142 to be something bigger.")
+			return errors.New("Image too big for button comms, aborting - you probably need to reset the Streamdeck at this stage, and modify the size of `payloads` on line 142 to be something bigger")
 		}
 	}
 	return nil

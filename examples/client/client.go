@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"time"
 
@@ -16,6 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("Found device [%s]\n", sd.GetName())
 
 	myButton := buttons.NewTextButton("Hi world")
 	myButton.SetActionHandler(&actionhandlers.TextPrintAction{Label: "You pressed me"})

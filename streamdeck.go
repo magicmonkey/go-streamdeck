@@ -47,6 +47,11 @@ func New() (*StreamDeck, error) {
 	return sd, nil
 }
 
+// GetName returns the name of the type of Streamdeck
+func (sd *StreamDeck) GetName() string {
+	return sd.dev.deviceType.name
+}
+
 // AddButton adds a `Button` object to the StreamDeck at the specified index
 func (sd *StreamDeck) AddButton(btnIndex int, b Button) {
 	b.RegisterUpdateHandler(sd.ButtonUpdateHandler)
