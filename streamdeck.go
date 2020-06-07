@@ -21,6 +21,7 @@ type Button interface {
 	ButtonDisplay
 }
 
+// ButtonDecorator represents a way to modify the button image, for example to add a highlight or an "on/off" hint
 type ButtonDecorator interface {
 	Apply(image.Image) image.Image
 }
@@ -54,6 +55,7 @@ func (sd *StreamDeck) AddButton(btnIndex int, b Button) {
 	sd.updateButton(b)
 }
 
+// SetDecorator imposes a ButtonDecorator onto a given button
 func (sd *StreamDeck) SetDecorator(btnIndex int, d ButtonDecorator) {
 	sd.decorators[btnIndex] = d
 	// If there's a button there, update it
