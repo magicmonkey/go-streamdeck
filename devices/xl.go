@@ -8,10 +8,11 @@ import (
 
 func init() {
 	streamdeck.RegisterDevicetype(
-		"Streamdeck XL",
-		image.Point{X: 96, Y: 96},
-		0x6c,                   // productID
-		[]byte{'\x03', '\x02'}, // reset packet
-		32,
+		"Streamdeck XL",           // Name
+		image.Point{X: 96, Y: 96}, // Width/height of a button
+		0x6c,                      // USB productID
+		[]byte{'\x03', '\x02'},    // Reset packet
+		32,                        // Number of buttons
+		[]byte{'\x03', '\x08'},    // Set brightness packet preamble
 	)
 }

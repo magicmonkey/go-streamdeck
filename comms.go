@@ -12,11 +12,12 @@ const vendorID = 0x0fd9
 
 // deviceType represents one of the various types of StreamDeck (mini/orig/orig2/xl)
 type deviceType struct {
-	name            string
-	imageSize       image.Point
-	usbProductID    uint16
-	resetPacket     []byte
-	numberOfButtons uint
+	name             string
+	imageSize        image.Point
+	usbProductID     uint16
+	resetPacket      []byte
+	numberOfButtons  uint
+	brightnessPacket []byte
 }
 
 var deviceTypes []deviceType
@@ -28,13 +29,15 @@ func RegisterDevicetype(
 	usbProductID uint16,
 	resetPacket []byte,
 	numberOfButtons uint,
+	brightnessPacket []byte,
 ) {
 	d := deviceType{
-		name:            name,
-		imageSize:       imageSize,
-		usbProductID:    usbProductID,
-		resetPacket:     resetPacket,
-		numberOfButtons: numberOfButtons,
+		name:             name,
+		imageSize:        imageSize,
+		usbProductID:     usbProductID,
+		resetPacket:      resetPacket,
+		numberOfButtons:  numberOfButtons,
+		brightnessPacket: brightnessPacket,
 	}
 	deviceTypes = append(deviceTypes, d)
 }
@@ -103,13 +106,15 @@ func (d *Device) SetBrightness(pct int) {
 		pct = 100
 	}
 
-	payload := []byte{'\x03', '\x08', byte(pct)}
+	preamble := d.deviceType.brightnessPacket
+	payload := append(preamble, byte(pct))
 	d.fd.SendFeatureReport(payload)
 }
 
 // ClearButtons writes a black square to all buttons
 func (d *Device) ClearButtons() {
-	for i := 0; i < 32; i++ {
+	numButtons := int(d.deviceType.numberOfButtons)
+	for i := 0; i < numButtons; i++ {
 		d.WriteColorToButton(i, color.Black)
 	}
 }
