@@ -7,17 +7,17 @@ import (
 )
 
 var (
-	name                     string
-	buttonWidth              uint
-	buttonHeight             uint
-	imageReportPayloadLength uint
+	xlName                     string
+	xlButtonWidth              uint
+	xlButtonHeight             uint
+	xlImageReportPayloadLength uint
 )
 
 // GetImageHeaderXl returns the USB comms header for a button image for the XL
 func GetImageHeaderXl(bytesRemaining uint, btnIndex uint, pageNumber uint) []byte {
 	thisLength := uint(0)
-	if imageReportPayloadLength < bytesRemaining {
-		thisLength = imageReportPayloadLength
+	if xlImageReportPayloadLength < bytesRemaining {
+		thisLength = xlImageReportPayloadLength
 	} else {
 		thisLength = bytesRemaining
 	}
@@ -38,20 +38,20 @@ func GetImageHeaderXl(bytesRemaining uint, btnIndex uint, pageNumber uint) []byt
 }
 
 func init() {
-	name = "Streamdeck XL"
-	buttonWidth = 96
-	buttonHeight = 96
-	imageReportPayloadLength = 1024
+	xlName = "Streamdeck XL"
+	xlButtonWidth = 96
+	xlButtonHeight = 96
+	xlImageReportPayloadLength = 1024
 	streamdeck.RegisterDevicetype(
-		name, // Name
-		image.Point{X: int(buttonWidth), Y: int(buttonHeight)}, // Width/height of a button
-		0x6c,                     // USB productID
-		[]byte{'\x03', '\x02'},   // Reset packet
-		32,                       // Number of buttons
-		[]byte{'\x03', '\x08'},   // Set brightness packet preamble
-		4,                        // Button read offset
-		"JPEG",                   // Image format
-		imageReportPayloadLength, // Amount of image payload allowed per USB packet
-		GetImageHeaderXl,         // Function to get the comms image header
+		xlName, // Name
+		image.Point{X: int(xlButtonWidth), Y: int(xlButtonHeight)}, // Width/height of a button
+		0x6c,                       // USB productID
+		[]byte{'\x03', '\x02'},     // Reset packet
+		32,                         // Number of buttons
+		[]byte{'\x03', '\x08'},     // Set brightness packet preamble
+		4,                          // Button read offset
+		"JPEG",                     // Image format
+		xlImageReportPayloadLength, // Amount of image payload allowed per USB packet
+		GetImageHeaderXl,           // Function to get the comms image header
 	)
 }
