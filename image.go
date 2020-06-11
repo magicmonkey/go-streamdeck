@@ -2,6 +2,7 @@ package streamdeck
 
 import (
 	"bytes"
+	"errors"
 	"image"
 	"image/color"
 	"image/draw"
@@ -24,10 +25,15 @@ func resizeAndRotate(img image.Image, width, height int) image.Image {
 	return res
 }
 
-func getImageAsJpeg(img image.Image) []byte {
+func getImageForButton(img image.Image, btnFormat string) ([]byte, error) {
 	var b bytes.Buffer
-	jpeg.Encode(&b, img, nil)
-	return b.Bytes()
+	switch btnFormat {
+	case "JPEG":
+		jpeg.Encode(&b, img, nil)
+	default:
+		return nil, errors.New("Unknown button image format: " + btnFormat)
+	}
+	return b.Bytes(), nil
 }
 
 func getSolidColourImage(colour color.Color) *image.RGBA {

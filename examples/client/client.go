@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/magicmonkey/go-streamdeck/actionhandlers"
 	"github.com/magicmonkey/go-streamdeck/buttons"
 	"github.com/magicmonkey/go-streamdeck/decorators"
+	_ "github.com/magicmonkey/go-streamdeck/devices"
 )
 
 func main() {
@@ -15,6 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("Found device [%s]\n", sd.GetName())
 
 	myButton := buttons.NewTextButton("Hi world")
 	myButton.SetActionHandler(&actionhandlers.TextPrintAction{Label: "You pressed me"})
@@ -28,7 +31,10 @@ func main() {
 	myNextButton.SetActionHandler(&actionhandlers.TextLabelChangeAction{NewLabel: "8"})
 	sd.AddButton(7, myNextButton)
 
-	anotherButton, _ := buttons.NewImageFileButton("/home/kevin/streamdeck/go-streamdeck/examples/play.jpg")
+	anotherButton, err := buttons.NewImageFileButton("examples/test/play.jpg")
+	if err != nil {
+		panic(err)
+	}
 	sd.AddButton(9, anotherButton)
 
 	cButton := buttons.NewColourButton(color.RGBA{255, 255, 0, 255})

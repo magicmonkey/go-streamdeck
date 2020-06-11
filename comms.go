@@ -8,12 +8,56 @@ import (
 	"github.com/karalabe/hid"
 )
 
-const vendorID = 4057
-const productID = 0x6c
+const vendorID = 0x0fd9
+
+// deviceType represents one of the various types of StreamDeck (mini/orig/orig2/xl)
+type deviceType struct {
+	name                string
+	imageSize           image.Point
+	usbProductID        uint16
+	resetPacket         []byte
+	numberOfButtons     uint
+	brightnessPacket    []byte
+	buttonReadOffset    uint
+	imageFormat         string
+	imagePayloadPerPage uint
+	imageHeaderFunc     func(bytesRemaining uint, btnIndex uint, pageNumber uint) []byte
+}
+
+var deviceTypes []deviceType
+
+// RegisterDevicetype allows the declaration of a new type of device, intended for use by subpackage "devices"
+func RegisterDevicetype(
+	name string,
+	imageSize image.Point,
+	usbProductID uint16,
+	resetPacket []byte,
+	numberOfButtons uint,
+	brightnessPacket []byte,
+	buttonReadOffset uint,
+	imageFormat string,
+	imagePayloadPerPage uint,
+	imageHeaderFunc func(bytesRemaining uint, btnIndex uint, pageNumber uint) []byte,
+) {
+	d := deviceType{
+		name:                name,
+		imageSize:           imageSize,
+		usbProductID:        usbProductID,
+		resetPacket:         resetPacket,
+		numberOfButtons:     numberOfButtons,
+		brightnessPacket:    brightnessPacket,
+		buttonReadOffset:    buttonReadOffset,
+		imageFormat:         imageFormat,
+		imagePayloadPerPage: imagePayloadPerPage,
+		imageHeaderFunc:     imageHeaderFunc,
+	}
+	deviceTypes = append(deviceTypes, d)
+}
 
 // Device is a struct which represents an actual Streamdeck device, and holds its reference to the USB HID device
 type Device struct {
 	fd                   *hid.Device
+	deviceType           deviceType
 	buttonPressListeners []func(int, *Device, error)
 }
 
@@ -29,22 +73,34 @@ func OpenWithoutReset() (*Device, error) {
 
 // Opens a new StreamdeckXL device, and returns a handle
 func rawOpen(reset bool) (*Device, error) {
-	devices := hid.Enumerate(vendorID, productID)
+	devices := hid.Enumerate(vendorID, 0)
 	if len(devices) == 0 {
-		return nil, errors.New("no stream deck device found")
+		return nil, errors.New("No elgato devices found")
 	}
+
+	retval := &Device{}
 	id := 0
+	// Iterate over the known device types, matching to product ID
+	for _, devType := range deviceTypes {
+		if devices[id].ProductID == devType.usbProductID {
+			retval.deviceType = devType
+		}
+	}
 	dev, err := devices[id].Open()
 	if err != nil {
 		return nil, err
 	}
-	retval := &Device{}
 	retval.fd = dev
 	if reset {
 		retval.ResetComms()
 	}
 	go retval.buttonPressListener()
 	return retval, nil
+}
+
+// GetName returns the name of the type of Streamdeck
+func (d *Device) GetName() string {
+	return d.deviceType.name
 }
 
 // Close the device
@@ -62,21 +118,27 @@ func (d *Device) SetBrightness(pct int) {
 		pct = 100
 	}
 
-	payload := []byte{'\x03', '\x08', byte(pct)}
+	preamble := d.deviceType.brightnessPacket
+	payload := append(preamble, byte(pct))
 	d.fd.SendFeatureReport(payload)
 }
 
 // ClearButtons writes a black square to all buttons
 func (d *Device) ClearButtons() {
-	for i := 0; i < 32; i++ {
+	numButtons := int(d.deviceType.numberOfButtons)
+	for i := 0; i < numButtons; i++ {
 		d.WriteColorToButton(i, color.Black)
 	}
 }
 
 // WriteColorToButton writes a specified color to the given button
-func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) {
+func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) error {
 	img := getSolidColourImage(colour)
-	d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
+	imgForButton, err := getImageForButton(img, d.deviceType.imageFormat)
+	if err != nil {
+		return err
+	}
+	return d.rawWriteToButton(btnIndex, imgForButton)
 }
 
 // WriteImageToButton writes a specified image file to the given button
@@ -90,18 +152,19 @@ func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
 }
 
 func (d *Device) buttonPressListener() {
-	var buttonMask [32]bool
+	var buttonMask []bool
+	buttonMask = make([]bool, d.deviceType.numberOfButtons)
 	for {
-		data := make([]byte, 50)
+		data := make([]byte, d.deviceType.numberOfButtons+d.deviceType.buttonReadOffset)
 		_, err := d.fd.Read(data)
 		if err != nil {
 			d.sendButtonPressEvent(-1, err)
 			break
 		}
-		for i := 0; i < 32; i++ {
-			if data[4+i] == 1 {
+		for i := uint(0); i < d.deviceType.numberOfButtons; i++ {
+			if data[d.deviceType.buttonReadOffset+i] == 1 {
 				if !buttonMask[i] {
-					d.sendButtonPressEvent(i, nil)
+					d.sendButtonPressEvent(int(i), nil)
 				}
 				buttonMask[i] = true
 			} else {
@@ -124,14 +187,18 @@ func (d *Device) ButtonPress(f func(int, *Device, error)) {
 
 // ResetComms will reset the comms protocol to the StreamDeck; useful if things have gotten de-synced, but it will also reboot the StreamDeck
 func (d *Device) ResetComms() {
-	payload := []byte{'\x03', '\x02'}
+	payload := d.deviceType.resetPacket
 	d.fd.SendFeatureReport(payload)
 }
 
 // WriteRawImageToButton takes an `image.Image` and writes it to the given button, after resizing and rotating the image to fit the button (for some reason the StreamDeck screens are all upside down)
 func (d *Device) WriteRawImageToButton(btnIndex int, rawImg image.Image) error {
-	img := resizeAndRotate(rawImg, 96, 96)
-	return d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
+	img := resizeAndRotate(rawImg, d.deviceType.imageSize.X, d.deviceType.imageSize.Y)
+	imgForButton, err := getImageForButton(img, d.deviceType.imageFormat)
+	if err != nil {
+		return err
+	}
+	return d.rawWriteToButton(btnIndex, imgForButton)
 }
 
 func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
@@ -139,33 +206,24 @@ func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 	pageNumber := 0
 	bytesRemaining := len(rawImage)
 
-	imageReportLength := 1024
-	imageReportHeaderLength := 8
-	imageReportPayloadLength := imageReportLength - imageReportHeaderLength
-
 	// Surely no image can be more than 20 packets...?
 	payloads := make([][]byte, 20)
 
 	for bytesRemaining > 0 {
+
+		header := d.deviceType.imageHeaderFunc(uint(bytesRemaining), uint(btnIndex), uint(pageNumber))
+		imageReportLength := int(d.deviceType.imagePayloadPerPage)
+		imageReportHeaderLength := len(header)
+		imageReportPayloadLength := imageReportLength - imageReportHeaderLength
+
 		thisLength := 0
 		if imageReportPayloadLength < bytesRemaining {
 			thisLength = imageReportPayloadLength
 		} else {
 			thisLength = bytesRemaining
 		}
+
 		bytesSent := pageNumber * imageReportPayloadLength
-		header := []byte{'\x02', '\x07', byte(btnIndex)}
-		if thisLength == bytesRemaining {
-			header = append(header, '\x01')
-		} else {
-			header = append(header, '\x00')
-		}
-
-		header = append(header, byte(thisLength&0xff))
-		header = append(header, byte(thisLength>>8))
-
-		header = append(header, byte(pageNumber&0xff))
-		header = append(header, byte(pageNumber>>8))
 
 		payload := append(header, rawImage[bytesSent:(bytesSent+thisLength)]...)
 		padding := make([]byte, imageReportLength-len(payload))
@@ -177,7 +235,7 @@ func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 		bytesRemaining = bytesRemaining - thisLength
 		pageNumber = pageNumber + 1
 		if pageNumber >= len(payloads) {
-			return errors.New("Image too big for button, aborting.  You probably need to reset the Streamdeck at this stage, and modify the size of `payloads` on line 142 to be something bigger.")
+			return errors.New("Image too big for button comms, aborting - you probably need to reset the Streamdeck at this stage, and modify the size of `payloads` on line 142 to be something bigger")
 		}
 	}
 	return nil
