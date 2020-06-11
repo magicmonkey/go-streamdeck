@@ -132,9 +132,13 @@ func (d *Device) ClearButtons() {
 }
 
 // WriteColorToButton writes a specified color to the given button
-func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) {
+func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) error {
 	img := getSolidColourImage(colour)
-	d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
+	imgForButton, err := getImageForButton(img, d.deviceType.imageFormat)
+	if err != nil {
+		return err
+	}
+	return d.rawWriteToButton(btnIndex, imgForButton)
 }
 
 // WriteImageToButton writes a specified image file to the given button
@@ -190,7 +194,11 @@ func (d *Device) ResetComms() {
 // WriteRawImageToButton takes an `image.Image` and writes it to the given button, after resizing and rotating the image to fit the button (for some reason the StreamDeck screens are all upside down)
 func (d *Device) WriteRawImageToButton(btnIndex int, rawImg image.Image) error {
 	img := resizeAndRotate(rawImg, d.deviceType.imageSize.X, d.deviceType.imageSize.Y)
-	return d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
+	imgForButton, err := getImageForButton(img, d.deviceType.imageFormat)
+	if err != nil {
+		return err
+	}
+	return d.rawWriteToButton(btnIndex, imgForButton)
 }
 
 func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
