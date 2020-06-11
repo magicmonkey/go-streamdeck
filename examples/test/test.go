@@ -32,7 +32,7 @@ func main() {
 			panic(err)
 		}
 		sd.ClearButtons()
-		sd.WriteImageToButton(btnIndex, "examples/play.jpg")
+		sd.WriteImageToButton(btnIndex, "examples/test/play.jpg")
 	})
 
 	var wg sync.WaitGroup

@@ -31,7 +31,7 @@ func main() {
 	myNextButton.SetActionHandler(&actionhandlers.TextLabelChangeAction{NewLabel: "8"})
 	sd.AddButton(7, myNextButton)
 
-	anotherButton, err := buttons.NewImageFileButton("/home/kevin/streamdeck/go-streamdeck/examples/test/play.jpg")
+	anotherButton, err := buttons.NewImageFileButton("examples/test/play.jpg")
 	if err != nil {
 		panic(err)
 	}
