@@ -31,7 +31,10 @@ func main() {
 	myNextButton.SetActionHandler(&actionhandlers.TextLabelChangeAction{NewLabel: "8"})
 	sd.AddButton(7, myNextButton)
 
-	anotherButton, _ := buttons.NewImageFileButton("/home/kevin/streamdeck/go-streamdeck/examples/play.jpg")
+	anotherButton, err := buttons.NewImageFileButton("/home/kevin/streamdeck/go-streamdeck/examples/test/play.jpg")
+	if err != nil {
+		panic(err)
+	}
 	sd.AddButton(9, anotherButton)
 
 	cButton := buttons.NewColourButton(color.RGBA{255, 255, 0, 255})

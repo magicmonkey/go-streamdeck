@@ -12,13 +12,16 @@ const vendorID = 0x0fd9
 
 // deviceType represents one of the various types of StreamDeck (mini/orig/orig2/xl)
 type deviceType struct {
-	name             string
-	imageSize        image.Point
-	usbProductID     uint16
-	resetPacket      []byte
-	numberOfButtons  uint
-	brightnessPacket []byte
-	buttonReadOffset uint
+	name                string
+	imageSize           image.Point
+	usbProductID        uint16
+	resetPacket         []byte
+	numberOfButtons     uint
+	brightnessPacket    []byte
+	buttonReadOffset    uint
+	imageFormat         string
+	imagePayloadPerPage uint
+	imageHeaderFunc     func(bytesRemaining uint, btnIndex uint, pageNumber uint) []byte
 }
 
 var deviceTypes []deviceType
@@ -32,15 +35,21 @@ func RegisterDevicetype(
 	numberOfButtons uint,
 	brightnessPacket []byte,
 	buttonReadOffset uint,
+	imageFormat string,
+	imagePayloadPerPage uint,
+	imageHeaderFunc func(bytesRemaining uint, btnIndex uint, pageNumber uint) []byte,
 ) {
 	d := deviceType{
-		name:             name,
-		imageSize:        imageSize,
-		usbProductID:     usbProductID,
-		resetPacket:      resetPacket,
-		numberOfButtons:  numberOfButtons,
-		brightnessPacket: brightnessPacket,
-		buttonReadOffset: buttonReadOffset,
+		name:                name,
+		imageSize:           imageSize,
+		usbProductID:        usbProductID,
+		resetPacket:         resetPacket,
+		numberOfButtons:     numberOfButtons,
+		brightnessPacket:    brightnessPacket,
+		buttonReadOffset:    buttonReadOffset,
+		imageFormat:         imageFormat,
+		imagePayloadPerPage: imagePayloadPerPage,
+		imageHeaderFunc:     imageHeaderFunc,
 	}
 	deviceTypes = append(deviceTypes, d)
 }
@@ -180,7 +189,7 @@ func (d *Device) ResetComms() {
 
 // WriteRawImageToButton takes an `image.Image` and writes it to the given button, after resizing and rotating the image to fit the button (for some reason the StreamDeck screens are all upside down)
 func (d *Device) WriteRawImageToButton(btnIndex int, rawImg image.Image) error {
-	img := resizeAndRotate(rawImg, 96, 96)
+	img := resizeAndRotate(rawImg, d.deviceType.imageSize.X, d.deviceType.imageSize.Y)
 	return d.rawWriteToButton(btnIndex, getImageAsJpeg(img))
 }
 
@@ -189,33 +198,24 @@ func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 	pageNumber := 0
 	bytesRemaining := len(rawImage)
 
-	imageReportLength := 1024
-	imageReportHeaderLength := 8
-	imageReportPayloadLength := imageReportLength - imageReportHeaderLength
-
 	// Surely no image can be more than 20 packets...?
 	payloads := make([][]byte, 20)
 
 	for bytesRemaining > 0 {
+
+		header := d.deviceType.imageHeaderFunc(uint(bytesRemaining), uint(btnIndex), uint(pageNumber))
+		imageReportLength := int(d.deviceType.imagePayloadPerPage)
+		imageReportHeaderLength := len(header)
+		imageReportPayloadLength := imageReportLength - imageReportHeaderLength
+
 		thisLength := 0
 		if imageReportPayloadLength < bytesRemaining {
 			thisLength = imageReportPayloadLength
 		} else {
 			thisLength = bytesRemaining
 		}
+
 		bytesSent := pageNumber * imageReportPayloadLength
-		header := []byte{'\x02', '\x07', byte(btnIndex)}
-		if thisLength == bytesRemaining {
-			header = append(header, '\x01')
-		} else {
-			header = append(header, '\x00')
-		}
-
-		header = append(header, byte(thisLength&0xff))
-		header = append(header, byte(thisLength>>8))
-
-		header = append(header, byte(pageNumber&0xff))
-		header = append(header, byte(pageNumber>>8))
 
 		payload := append(header, rawImage[bytesSent:(bytesSent+thisLength)]...)
 		padding := make([]byte, imageReportLength-len(payload))
