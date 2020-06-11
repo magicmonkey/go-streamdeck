@@ -14,5 +14,6 @@ func init() {
 		[]byte{'\x03', '\x02'},    // Reset packet
 		32,                        // Number of buttons
 		[]byte{'\x03', '\x08'},    // Set brightness packet preamble
+		4,                         // Button read offset
 	)
 }

@@ -18,6 +18,7 @@ type deviceType struct {
 	resetPacket      []byte
 	numberOfButtons  uint
 	brightnessPacket []byte
+	buttonReadOffset uint
 }
 
 var deviceTypes []deviceType
@@ -30,6 +31,7 @@ func RegisterDevicetype(
 	resetPacket []byte,
 	numberOfButtons uint,
 	brightnessPacket []byte,
+	buttonReadOffset uint,
 ) {
 	d := deviceType{
 		name:             name,
@@ -38,6 +40,7 @@ func RegisterDevicetype(
 		resetPacket:      resetPacket,
 		numberOfButtons:  numberOfButtons,
 		brightnessPacket: brightnessPacket,
+		buttonReadOffset: buttonReadOffset,
 	}
 	deviceTypes = append(deviceTypes, d)
 }
@@ -136,18 +139,19 @@ func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
 }
 
 func (d *Device) buttonPressListener() {
-	var buttonMask [32]bool
+	var buttonMask []bool
+	buttonMask = make([]bool, d.deviceType.numberOfButtons)
 	for {
-		data := make([]byte, 50)
+		data := make([]byte, d.deviceType.numberOfButtons+d.deviceType.buttonReadOffset)
 		_, err := d.fd.Read(data)
 		if err != nil {
 			d.sendButtonPressEvent(-1, err)
 			break
 		}
-		for i := 0; i < 32; i++ {
-			if data[4+i] == 1 {
+		for i := uint(0); i < d.deviceType.numberOfButtons; i++ {
+			if data[d.deviceType.buttonReadOffset+i] == 1 {
 				if !buttonMask[i] {
-					d.sendButtonPressEvent(i, nil)
+					d.sendButtonPressEvent(int(i), nil)
 				}
 				buttonMask[i] = true
 			} else {
