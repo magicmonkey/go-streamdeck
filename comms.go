@@ -80,11 +80,17 @@ func rawOpen(reset bool) (*Device, error) {
 
 	retval := &Device{}
 	id := 0
+	found := false
 	// Iterate over the known device types, matching to product ID
 	for _, devType := range deviceTypes {
 		if devices[id].ProductID == devType.usbProductID {
 			retval.deviceType = devType
+			found = true
+			break
 		}
+	}
+	if !found {
+		return nil, errors.New("Found an Elgato device, but not one which there is a definition for")
 	}
 	dev, err := devices[id].Open()
 	if err != nil {
