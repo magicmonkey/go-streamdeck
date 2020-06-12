@@ -90,7 +90,7 @@ func rawOpen(reset bool) (*Device, error) {
 		}
 	}
 	if !found {
-		return nil, errors.New("Found an Elgato device, but not one which there is a definition for")
+		return nil, errors.New("Found an Elgato device, but not one for which there is a definition; have you imported the devices package?")
 	}
 	dev, err := devices[id].Open()
 	if err != nil {
