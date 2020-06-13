@@ -61,4 +61,5 @@ func main() {
 
 	myButton.SetText("Bye!")
 	cButton.SetColour(color.RGBA{0, 255, 255, 255})
+	sd.UnsetDecorator(19)
 }
