@@ -210,6 +210,7 @@ func (d *Device) WriteRawImageToButton(btnIndex int, rawImg image.Image) error {
 }
 
 func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
+	d.mutex.Lock()
 	// Based on set_key_image from https://github.com/abcminiuser/python-elgato-streamdeck/blob/master/src/StreamDeck/Devices/StreamDeckXL.py#L151
 	pageNumber := 0
 	bytesRemaining := len(rawImage)
