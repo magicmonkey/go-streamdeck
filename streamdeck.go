@@ -70,6 +70,16 @@ func (sd *StreamDeck) SetDecorator(btnIndex int, d ButtonDecorator) {
 	}
 }
 
+// UnsetDecorator removes a ButtonDecorator from a given button
+func (sd *StreamDeck) UnsetDecorator(btnIndex int) {
+	delete(sd.decorators, btnIndex)
+	// If there's a button there, update it
+	btn, ok := sd.buttons[btnIndex]
+	if ok {
+		sd.updateButton(btn)
+	}
+}
+
 // ButtonUpdateHandler allows a user of this library to signal when something external has changed, such that this button should be update
 func (sd *StreamDeck) ButtonUpdateHandler(b Button) {
 	sd.buttons[b.GetButtonIndex()] = b
