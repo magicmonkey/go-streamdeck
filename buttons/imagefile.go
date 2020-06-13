@@ -2,6 +2,7 @@ package buttons
 
 import (
 	"image"
+	"image/draw"
 	"os"
 
 	streamdeck "github.com/magicmonkey/go-streamdeck"
@@ -43,10 +44,19 @@ func (btn *ImageFileButton) loadImage() error {
 		return err
 	}
 	img, _, err := image.Decode(f)
+
+	// We want the image as an RGBA, so convert it if it isn't
+	var newimg *image.RGBA
+	newimg, ok := img.(*image.RGBA)
+	if !ok {
+		newimg = image.NewRGBA(image.Rect(0, 0, 96, 96))
+		draw.Draw(newimg, newimg.Bounds(), img, image.Point{0, 0}, draw.Src)
+	}
+
 	if err != nil {
 		return err
 	}
-	btn.img = img
+	btn.img = newimg
 	return nil
 }
 
