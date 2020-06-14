@@ -17,7 +17,10 @@ type ImageFileButton struct {
 }
 
 func (btn *ImageFileButton) GetImageForButton() image.Image {
-	return btn.img
+	// TODO base the 96 on the image bounds
+	newimg := image.NewRGBA(image.Rect(0, 0, 96, 96))
+	draw.Draw(newimg, newimg.Bounds(), btn.img, image.Point{0, 0}, draw.Src)
+	return newimg
 }
 
 func (btn *ImageFileButton) SetButtonIndex(btnIndex int) {
@@ -49,6 +52,7 @@ func (btn *ImageFileButton) loadImage() error {
 	var newimg *image.RGBA
 	newimg, ok := img.(*image.RGBA)
 	if !ok {
+		// TODO base the 96 on the button size
 		newimg = image.NewRGBA(image.Rect(0, 0, 96, 96))
 		draw.Draw(newimg, newimg.Bounds(), img, image.Point{0, 0}, draw.Src)
 	}
