@@ -12,6 +12,7 @@ import (
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 )
 
+// TextButton represents a button with text on it
 type TextButton struct {
 	label            string
 	textColour       color.Color
@@ -21,53 +22,71 @@ type TextButton struct {
 	actionHandler    streamdeck.ButtonActionHandler
 }
 
+// GetImageForButton is the interface implemention to get the button's image as an image.Image
 func (btn *TextButton) GetImageForButton() image.Image {
 	img := getImageWithText(btn.label, btn.textColour, btn.backgroundColour)
 	return img
 }
 
+// SetButtonIndex is the interface implemention to set which button on the Streamdeck this is
 func (btn *TextButton) SetButtonIndex(btnIndex int) {
 	btn.btnIndex = btnIndex
 }
 
+// GetButtonIndex is the interface implemention to get which button on the Streamdeck this is
 func (btn *TextButton) GetButtonIndex() int {
 	return btn.btnIndex
 }
 
+// SetText allows the text on the button to be changed on the fly
 func (btn *TextButton) SetText(label string) {
 	btn.label = label
 	btn.updateHandler(btn)
 }
 
+// SetTextColour allows the colour of the text on the button to be changed on the fly
 func (btn *TextButton) SetTextColour(textColour color.Color) {
 	btn.textColour = textColour
 	btn.updateHandler(btn)
 }
 
+// SetBackgroundColor allows the background colour on the button to be changed on the fly
 func (btn *TextButton) SetBackgroundColor(backgroundColour color.Color) {
 	btn.backgroundColour = backgroundColour
 	btn.updateHandler(btn)
 }
 
+// RegisterUpdateHandler is the interface implemention to let the engine give this button a callback to
+// use to request that the button image is updated on the Streamdeck.
 func (btn *TextButton) RegisterUpdateHandler(f func(streamdeck.Button)) {
 	btn.updateHandler = f
 }
 
+// SetActionHandler allows a ButtonActionHandler implementation to be
+// set on this button, so that something can happen when the button is pressed.
 func (btn *TextButton) SetActionHandler(a streamdeck.ButtonActionHandler) {
 	btn.actionHandler = a
 }
 
+// Pressed is the interface implementation for letting the engine notify that the button has been
+// pressed.  This hands-off to the specified ButtonActionHandler if it has been set.
 func (btn *TextButton) Pressed() {
 	if btn.actionHandler != nil {
 		btn.actionHandler.Pressed(btn)
 	}
 }
 
+// NewTextButton creates a new TextButton with the specified text on it, in white on a black
+// background.  The text will be set on a single line, and auto-sized to fill the button as best
+// as possible.
 func NewTextButton(label string) *TextButton {
 	btn := NewTextButtonWithColours(label, color.White, color.Black)
 	return btn
 }
 
+// NewTextButtonWithColours creates a new TextButton with the specified text on it, in the specified
+// text and background colours.  The text will be set on a single line, and auto-sized to fill the
+// button as best as possible.
 func NewTextButtonWithColours(label string, textColour color.Color, backgroundColour color.Color) *TextButton {
 	btn := &TextButton{label: label, textColour: textColour, backgroundColour: backgroundColour}
 	return btn
@@ -92,17 +111,17 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 		}
 	}
 
-	src_img := image.NewUniform(textColour)
+	srcImg := image.NewUniform(textColour)
 
-	dst_img := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
-	draw.Draw(dst_img, dst_img.Bounds(), image.NewUniform(backgroundColour), image.Point{0, 0}, draw.Src)
+	dstImg := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
+	draw.Draw(dstImg, dstImg.Bounds(), image.NewUniform(backgroundColour), image.Point{0, 0}, draw.Src)
 
 	c := freetype.NewContext()
 	c.SetFont(myfont)
-	c.SetDst(dst_img)
-	c.SetSrc(src_img)
+	c.SetDst(dstImg)
+	c.SetSrc(srcImg)
 	c.SetFontSize(size)
-	c.SetClip(dst_img.Bounds())
+	c.SetClip(dstImg.Bounds())
 
 	x := int((96 - width) / 2) // Horizontally centre text
 	y := int(50 + (size / 3))  // Fudged vertical centre, erm, very "heuristic"
@@ -115,14 +134,14 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 		fmt.Println(textWidth)
 
 		f := &font.Drawer{
-			Dst:  dst_img,
+			Dst:  dstImg,
 			Src:  src_img,
 			Face: basicfont.Face7x13,
 			Dot:  fixed.Point26_6{fixed.Int26_6(x * 64), fixed.Int26_6(y * 64)},
 		}
 		f.DrawString(text)
 	*/
-	return dst_img
+	return dstImg
 }
 
 func getTextWidth(text string, size float64) int {
