@@ -7,7 +7,7 @@ All issues, pull requests and other feedback are very welcome in this project. P
 - [Submit a Patch or Pull Request](#submit-a-patch-or-pull-request)
 - [Try the Examples](#try-the-examples)
 - [Usage in Other Projects](#usage-in-other-projects)
--
+
 ## Use Go-Streamdeck From Source
 
 To use the `master` branch, another branch, or a branch in your own fork, you can use the `replace` syntax in your `go.mod` file. For more information and an example try this [excellent blog post from Pam Selle](https://thewebivore.com/using-replace-in-go-mod-to-point-to-your-local-module/).
@@ -30,4 +30,4 @@ Please open an issue to update us for which operating systems and StreamDeck com
 
 ## Usage in Other Projects
 
-You are very welcome to use this project within the terms of the license. We would love to have you in our showcase, please open a pull request to update the `REAMDME.md` file with a link to your project.
+You are very welcome to use this project within the terms of the license. We would love to have you in our showcase, please open a pull request to update the `README.md` file with a link to your project.
