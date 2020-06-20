@@ -6,6 +6,13 @@ A Go interface to an Elgato Streamdeck (currently works with the 32-button XL on
 
 _Designed for and tested with Ubuntu, Go 1.13+ and a Streamdeck XL. Images are the wrong size for other streamdecks; bug reports and patches are welcome!_
 
+- [Installation](#installation)
+- [Usage](#usage)
+  * [Example high-level usage](#example-high-level-usage)
+  * [Example low-level usage](#example-low-level-usage)
+- [Showcase](#showcase)
+- [Contributions](#contributions)
+
 ## Installation
 
 Either include the library in your project or install it with the following command:
@@ -109,6 +116,14 @@ func main() {
 
 The program runs for 20 seconds and then exits.
 
+## Showcase
+
+Projects using this library (pull request to add yours!)
+
+* [Streamdeck tricks](https://github.com/lornajane/streamdeck-tricks)
+
 ## Contributions
 
 This is a very new project but all feedback, comments, questions and patches are more than welcome. Please get in touch by opening an issue, it would be good to hear who is using the project and how things are going.
+
+For more, see [CONTRIBUTING.md](CONTRIBUTING.md).
