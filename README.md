@@ -47,6 +47,7 @@ import (
 	streamdeck "github.com/magicmonkey/go-streamdeck"
 	"github.com/magicmonkey/go-streamdeck/actionhandlers"
 	"github.com/magicmonkey/go-streamdeck/buttons"
+	_ "github.com/magicmonkey/go-streamdeck/devices"
 )
 
 func main() {
