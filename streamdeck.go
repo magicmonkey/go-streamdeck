@@ -86,6 +86,15 @@ func (sd *StreamDeck) ButtonUpdateHandler(b Button) {
 	sd.updateButton(b)
 }
 
+// GetButtonByIndex returns a button for the given index
+func (sd *StreamDeck) GetButtonIndex(btnIndex int) Button {
+	b, ok := sd.buttons[btnIndex]
+	if !ok {
+		return nil
+	}
+	return b
+}
+
 func (sd *StreamDeck) pressHandler(btnIndex int, d *Device, err error) {
 	if err != nil {
 		panic(err)
