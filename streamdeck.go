@@ -114,3 +114,7 @@ func (sd *StreamDeck) updateButton(b Button) error {
 	e := sd.dev.WriteRawImageToButton(b.GetButtonIndex(), img)
 	return e
 }
+
+func (sd *StreamDeck) SetBrightness(brightness int) {
+    sd.dev.SetBrightness(brightness)
+}
