@@ -17,6 +17,7 @@ type ColourButton struct {
 }
 
 // GetImageForButton is the interface implemention to get the button's image as an image.Image
+// TODO stop hard-coding 96, get it from the stremdeck definition instead
 func (btn *ColourButton) GetImageForButton() image.Image {
 	ButtonSize := 96
 	img := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))

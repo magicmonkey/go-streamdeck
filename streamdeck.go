@@ -1,6 +1,10 @@
 package streamdeck
 
-import "image"
+import (
+	"image"
+	"image/color"
+	"image/draw"
+)
 
 // ButtonDisplay is the interface to satisfy for displaying on a button
 type ButtonDisplay interface {
@@ -58,6 +62,17 @@ func (sd *StreamDeck) AddButton(btnIndex int, b Button) {
 	b.SetButtonIndex(btnIndex)
 	sd.buttons[btnIndex] = b
 	sd.updateButton(b)
+}
+
+// DelButton removes a `Button` object from the StreamDeck at the specified index
+// TODO stop hard-coding 96
+func (sd *StreamDeck) DelButton(btnIndex int) {
+	delete(sd.buttons, btnIndex)
+
+	ButtonSize := 96
+	img := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
+	draw.Draw(img, img.Bounds(), image.NewUniform(color.Black), image.Point{0, 0}, draw.Src)
+	sd.dev.WriteRawImageToButton(btnIndex, img)
 }
 
 // SetDecorator imposes a ButtonDecorator onto a given button
