@@ -68,6 +68,7 @@ func (sd *StreamDeck) AddButton(btnIndex int, b Button) {
 // TODO stop hard-coding 96
 func (sd *StreamDeck) DelButton(btnIndex int) {
 	delete(sd.buttons, btnIndex)
+	sd.UnsetDecorator(btnIndex)
 
 	ButtonSize := 96
 	img := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
@@ -131,5 +132,5 @@ func (sd *StreamDeck) updateButton(b Button) error {
 }
 
 func (sd *StreamDeck) SetBrightness(brightness int) {
-    sd.dev.SetBrightness(brightness)
+	sd.dev.SetBrightness(brightness)
 }
