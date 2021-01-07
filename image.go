@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/disintegration/gift"
+	"golang.org/x/image/bmp"
 )
 
 func resizeAndRotate(img image.Image, width, height int) image.Image {
@@ -30,6 +31,8 @@ func getImageForButton(img image.Image, btnFormat string) ([]byte, error) {
 	switch btnFormat {
 	case "JPEG":
 		jpeg.Encode(&b, img, nil)
+	case "BMP":
+		bmp.Encode(&b, img)
 	default:
 		return nil, errors.New("Unknown button image format: " + btnFormat)
 	}
@@ -37,7 +40,7 @@ func getImageForButton(img image.Image, btnFormat string) ([]byte, error) {
 }
 
 func getSolidColourImage(colour color.Color) *image.RGBA {
-	ButtonSize := 96
+	ButtonSize := 80
 	img := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
 	//colour := color.RGBA{red, green, blue, 0}
 	draw.Draw(img, img.Bounds(), image.NewUniform(colour), image.Point{0, 0}, draw.Src)

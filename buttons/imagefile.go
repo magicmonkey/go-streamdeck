@@ -21,7 +21,7 @@ type ImageFileButton struct {
 // GetImageForButton is the interface implemention to get the button's image as an image.Image
 func (btn *ImageFileButton) GetImageForButton() image.Image {
 	// TODO base the 96 on the image bounds
-	newimg := image.NewRGBA(image.Rect(0, 0, 96, 96))
+	newimg := image.NewRGBA(image.Rect(0, 0, 80, 80))
 	draw.Draw(newimg, newimg.Bounds(), btn.img, image.Point{0, 0}, draw.Src)
 	return newimg
 }
@@ -59,7 +59,7 @@ func (btn *ImageFileButton) loadImage() error {
 	newimg, ok := img.(*image.RGBA)
 	if !ok {
 		// TODO base the 96 on the button size
-		newimg = image.NewRGBA(image.Rect(0, 0, 96, 96))
+		newimg = image.NewRGBA(image.Rect(0, 0, 80, 80))
 		draw.Draw(newimg, newimg.Bounds(), img, image.Point{0, 0}, draw.Src)
 	}
 
