@@ -118,3 +118,7 @@ func (sd *StreamDeck) updateButton(b Button) error {
 func (sd *StreamDeck) SetBrightness(brightness int) {
     sd.dev.SetBrightness(brightness)
 }
+
+func (sd *StreamDeck) SetSerial(b []byte) error {
+	return sd.dev.SetSerial(b)
+}

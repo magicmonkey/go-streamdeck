@@ -50,11 +50,12 @@ func init() {
 		miniName, // Name
 		image.Point{X: int(miniButtonWidth), Y: int(miniButtonHeight)}, // Width/height of a button
 		0x63,                        // USB productID
-		[]byte{'\x03', '\x02'},      // Reset packet
+		[]byte{'\x03', '\x00', '\x42', '\x00', '\x4C', '\x00', '\x33', '\x00', '\x31', '\x00', '\x4A', '\x00', '\x31', '\x00', '\x42', '\x00', '\x30', '\x00', '\x31', '\x00', '\x35', '\x00', '\x38', '\x00', '\x32', '\x00'},      // Reset packet
 		6,                          // Number of buttons
-		[]byte{'\x03', '\x08'},      // Set brightness packet preamble
-		4,                           // Button read offset
-		"JPEG",                      // Image format
+		//[]byte{'\x05', '\x55', '\xaa', '\xd1', '\x01'},      // Set brightness packet preamble
+		[]byte{'\x03', '\x00', '\x42', '\x00', '\x4C', '\x00', '\x33', '\x00', '\x31', '\x00', '\x4A', '\x00', '\x31', '\x00', '\x42', '\x00', '\x30', '\x00', '\x31', '\x00', '\x35', '\x00', '\x38', '\x00', '\x32', '\x00'},      // Reset packet
+		0,                           // Button read offset
+		"BMP",                      // Image format
 		miniImageReportPayloadLength, // Amount of image payload allowed per USB packet
 		GetImageHeaderMini,           // Function to get the comms image header
 	)

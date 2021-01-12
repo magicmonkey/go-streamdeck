@@ -125,8 +125,8 @@ func (d *Device) SetBrightness(pct int) {
 	}
 
 	preamble := d.deviceType.brightnessPacket
-	payload := append(preamble, byte(pct))
-	d.fd.SendFeatureReport(payload)
+	//payload := append(preamble, byte(pct))
+	d.fd.SendFeatureReport(preamble)
 }
 
 // ClearButtons writes a black square to all buttons
@@ -135,6 +135,15 @@ func (d *Device) ClearButtons() {
 	for i := 0; i < numButtons; i++ {
 		d.WriteColorToButton(i, color.Black)
 	}
+}
+
+// Display the Serial Number
+func (d *Device) SetSerial(b []byte) error {
+	_, err := d.fd.Write(b)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // WriteColorToButton writes a specified color to the given button
