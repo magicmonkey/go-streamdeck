@@ -17,43 +17,54 @@ var (
 
 // GetImageHeaderMini returns the USB comms header for a button image for the XL
 func GetImageHeaderMini(bytesRemaining uint, btnIndex uint, pageNumber uint) []byte {
-	thisLength := uint(0)
+	var thisLength uint
 	if miniImageReportPayloadLength < bytesRemaining {
 		thisLength = miniImageReportPayloadLength
 	} else {
 		thisLength = bytesRemaining
 	}
-	header := []byte{'\x02', '\x07', byte(btnIndex)}
-	if thisLength == bytesRemaining {
-		header = append(header, '\x01')
-	} else {
-		header = append(header, '\x00')
+	header := []byte{
+		'\x02',
+		'\x01',
+		byte(pageNumber),
+		0,
+		get_header_element(thisLength, bytesRemaining),
+		byte(btnIndex + 1),
+		'\x00',
+		'\x00',
+		'\x00',
+		'\x00',
+		'\x00',
+		'\x00',
+		'\x00',
+		'\x00',
+		'\x00',
+		'\x00',
 	}
 
-	header = append(header, byte(thisLength&0xff))
-	header = append(header, byte(thisLength>>8))
-
-	header = append(header, byte(pageNumber&0xff))
-	header = append(header, byte(pageNumber>>8))
-
 	return header
+}
+
+func get_header_element(thisLength, bytesRemaining uint) byte {
+	if thisLength == bytesRemaining {
+		return '\x01'
+	} else {
+		return '\x00'
+	}
 }
 
 func init() {
 	miniName = "Streamdeck Mini"
 	miniButtonWidth = 80
 	miniButtonHeight = 80
-	miniImageReportLength = 1024
-	miniImageReportHeaderLength = 16
-	miniImageReportPayloadLength = miniImageReportLength - miniImageReportHeaderLength
+	miniImageReportPayloadLength = 1024
 	streamdeck.RegisterDevicetype(
 		miniName, // Name
 		image.Point{X: int(miniButtonWidth), Y: int(miniButtonHeight)}, // Width/height of a button
 		0x63,                        // USB productID
-		[]byte{'\x03', '\x00', '\x42', '\x00', '\x4C', '\x00', '\x33', '\x00', '\x31', '\x00', '\x4A', '\x00', '\x31', '\x00', '\x42', '\x00', '\x30', '\x00', '\x31', '\x00', '\x35', '\x00', '\x38', '\x00', '\x32', '\x00'},      // Reset packet
+		[]byte{0x0B, 0x63},      // Reset packet
 		6,                          // Number of buttons
-		//[]byte{'\x05', '\x55', '\xaa', '\xd1', '\x01'},      // Set brightness packet preamble
-		[]byte{'\x03', '\x00', '\x42', '\x00', '\x4C', '\x00', '\x33', '\x00', '\x31', '\x00', '\x4A', '\x00', '\x31', '\x00', '\x42', '\x00', '\x30', '\x00', '\x31', '\x00', '\x35', '\x00', '\x38', '\x00', '\x32', '\x00'},      // Reset packet
+		[]byte{0x05, 0x55, 0xaa, 0xd1, 0x01},      // Reset packet
 		0,                           // Button read offset
 		"BMP",                      // Image format
 		miniImageReportPayloadLength, // Amount of image payload allowed per USB packet

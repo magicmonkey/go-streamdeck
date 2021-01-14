@@ -23,8 +23,8 @@ type TextButton struct {
 }
 
 // GetImageForButton is the interface implemention to get the button's image as an image.Image
-func (btn *TextButton) GetImageForButton() image.Image {
-	img := getImageWithText(btn.label, btn.textColour, btn.backgroundColour)
+func (btn *TextButton) GetImageForButton(btnSize int) image.Image {
+	img := getImageWithText(btn.label, btn.textColour, btn.backgroundColour, btnSize)
 	return img
 }
 
@@ -92,9 +92,8 @@ func NewTextButtonWithColours(label string, textColour color.Color, backgroundCo
 	return btn
 }
 
-func getImageWithText(text string, textColour color.Color, backgroundColour color.Color) image.Image {
+func getImageWithText(text string, textColour color.Color, backgroundColour color.Color, btnSize int) image.Image {
 
-	ButtonSize := 96
 	size := float64(18)
 
 	myfont, err := truetype.Parse(gomedium.TTF)
@@ -113,7 +112,7 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 
 	srcImg := image.NewUniform(textColour)
 
-	dstImg := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
+	dstImg := image.NewRGBA(image.Rect(0, 0, btnSize, btnSize))
 	draw.Draw(dstImg, dstImg.Bounds(), image.NewUniform(backgroundColour), image.Point{0, 0}, draw.Src)
 
 	c := freetype.NewContext()
@@ -123,7 +122,7 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 	c.SetFontSize(size)
 	c.SetClip(dstImg.Bounds())
 
-	x := int((96 - width) / 2) // Horizontally centre text
+	x := int((btnSize - width) / 2) // Horizontally centre text
 	y := int(50 + (size / 3))  // Fudged vertical centre, erm, very "heuristic"
 
 	pt := freetype.Pt(x, y)

@@ -12,11 +12,11 @@ import (
 
 // WriteTextToButton is a low-level way to write text directly onto a button on the StreamDeck
 func (d *Device) WriteTextToButton(btnIndex int, text string, textColour color.Color, backgroundColour color.Color) {
-	img := getImageWithText(text, textColour, backgroundColour)
+	img := getImageWithText(text, textColour, backgroundColour, d.deviceType.imageSize.X)
 	d.WriteRawImageToButton(btnIndex, img)
 }
 
-func getImageWithText(text string, textColour color.Color, backgroundColour color.Color) image.Image {
+func getImageWithText(text string, textColour color.Color, backgroundColour color.Color, btnSize int) image.Image {
 
 	size := float64(18)
 
@@ -35,7 +35,7 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 	}
 
 	srcImg := image.NewUniform(textColour)
-	dstImg := getSolidColourImage(backgroundColour)
+	dstImg := getSolidColourImage(backgroundColour, btnSize)
 
 	c := freetype.NewContext()
 	c.SetFont(myfont)
@@ -44,7 +44,7 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 	c.SetFontSize(size)
 	c.SetClip(dstImg.Bounds())
 
-	x := int((96 - width) / 2) // Horizontally centre text
+	x := int((btnSize - width) / 2) // Horizontally centre text
 	y := int(50 + (size / 3))  // Fudged vertical centre, erm, very "heuristic"
 
 	pt := freetype.Pt(x, y)
