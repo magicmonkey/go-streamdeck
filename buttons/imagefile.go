@@ -1,6 +1,7 @@
 package buttons
 
 import (
+	"github.com/disintegration/gift"
 	"image"
 	"image/draw"
 	"os"
@@ -20,9 +21,10 @@ type ImageFileButton struct {
 
 // GetImageForButton is the interface implemention to get the button's image as an image.Image
 func (btn *ImageFileButton) GetImageForButton(btnSize int) image.Image {
-	// TODO base the 96 on the image bounds
-	newimg := image.NewRGBA(image.Rect(0, 0, btnSize, btnSize))
-	draw.Draw(newimg, newimg.Bounds(), btn.img, image.Point{0, 0}, draw.Src)
+	// Resize the image to what the button wants
+	g := gift.New(gift.Resize(btnSize, btnSize, gift.LanczosResampling))
+	newimg := image.NewRGBA(image.Rect(0, 0, btn.img.Bounds().Max.X, btn.img.Bounds().Max.Y))
+	g.Draw(newimg, btn.img)
 	return newimg
 }
 
@@ -37,9 +39,9 @@ func (btn *ImageFileButton) GetButtonIndex() int {
 }
 
 // SetFilePath allows the image file to be changed on the fly
-func (btn *ImageFileButton) SetFilePath(filePath string, btnSize int) error {
+func (btn *ImageFileButton) SetFilePath(filePath string) error {
 	btn.filePath = filePath
-	err := btn.loadImage(btnSize)
+	err := btn.loadImage()
 	if err != nil {
 		return err
 	}
@@ -47,7 +49,7 @@ func (btn *ImageFileButton) SetFilePath(filePath string, btnSize int) error {
 	return nil
 }
 
-func (btn *ImageFileButton) loadImage(btnSize int) error {
+func (btn *ImageFileButton) loadImage() error {
 	f, err := os.Open(btn.filePath)
 	if err != nil {
 		return err
@@ -58,8 +60,7 @@ func (btn *ImageFileButton) loadImage(btnSize int) error {
 	var newimg *image.RGBA
 	newimg, ok := img.(*image.RGBA)
 	if !ok {
-		// TODO base the 96 on the button size
-		newimg = image.NewRGBA(image.Rect(0, 0, btnSize, btnSize))
+		newimg = image.NewRGBA(image.Rect(0, 0, img.Bounds().Max.X, img.Bounds().Max.Y))
 		draw.Draw(newimg, newimg.Bounds(), img, image.Point{0, 0}, draw.Src)
 	}
 
@@ -91,9 +92,9 @@ func (btn *ImageFileButton) Pressed() {
 }
 
 // NewImageFileButton creates a new ImageFileButton with the specified image on it
-func NewImageFileButton(filePath string, btnSize int) (*ImageFileButton, error) {
+func NewImageFileButton(filePath string) (*ImageFileButton, error) {
 	btn := &ImageFileButton{filePath: filePath}
-	err := btn.loadImage(btnSize)
+	err := btn.loadImage()
 	if err != nil {
 		return nil, err
 	}
