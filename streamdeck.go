@@ -4,7 +4,7 @@ import "image"
 
 // ButtonDisplay is the interface to satisfy for displaying on a button
 type ButtonDisplay interface {
-	GetImageForButton() image.Image
+	GetImageForButton(int) image.Image
 	GetButtonIndex() int
 	SetButtonIndex(int)
 	RegisterUpdateHandler(func(Button))
@@ -23,7 +23,7 @@ type Button interface {
 
 // ButtonDecorator represents a way to modify the button image, for example to add a highlight or an "on/off" hint
 type ButtonDecorator interface {
-	Apply(image.Image) image.Image
+	Apply(image.Image, int) image.Image
 }
 
 // StreamDeck is the main struct to represent a StreamDeck device, and internally contains the reference to a `Device`
@@ -106,15 +106,15 @@ func (sd *StreamDeck) pressHandler(btnIndex int, d *Device, err error) {
 }
 
 func (sd *StreamDeck) updateButton(b Button) error {
-	img := b.GetImageForButton()
+	img := b.GetImageForButton(sd.dev.deviceType.imageSize.X)
 	decorator, ok := sd.decorators[b.GetButtonIndex()]
 	if ok {
-		img = decorator.Apply(img)
+		img = decorator.Apply(img, sd.dev.deviceType.imageSize.X)
 	}
 	e := sd.dev.WriteRawImageToButton(b.GetButtonIndex(), img)
 	return e
 }
 
 func (sd *StreamDeck) SetBrightness(brightness int) {
-    sd.dev.SetBrightness(brightness)
+	sd.dev.SetBrightness(brightness)
 }

@@ -17,9 +17,8 @@ type ColourButton struct {
 }
 
 // GetImageForButton is the interface implemention to get the button's image as an image.Image
-func (btn *ColourButton) GetImageForButton() image.Image {
-	ButtonSize := 96
-	img := image.NewRGBA(image.Rect(0, 0, ButtonSize, ButtonSize))
+func (btn *ColourButton) GetImageForButton(btnSize int) image.Image {
+	img := image.NewRGBA(image.Rect(0, 0, btnSize, btnSize))
 	//colour := color.RGBA{red, green, blue, 0}
 	draw.Draw(img, img.Bounds(), image.NewUniform(btn.colour), image.Point{0, 0}, draw.Src)
 	return img

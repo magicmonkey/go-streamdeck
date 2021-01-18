@@ -15,11 +15,11 @@ func NewBorder(width int, colour color.Color) *Border {
 	return b
 }
 
-func (b *Border) Apply(img image.Image) image.Image {
+func (b *Border) Apply(img image.Image, size int) image.Image {
 	newimg := img.(*image.RGBA)
 	// TODO base the 96 on the image bounds
 	for i := 0; i < b.width; i++ {
-		rect(i, i, 96-i, 96-i, newimg, b.colour)
+		rect(i, i, size-i, size-i, newimg, b.colour)
 	}
 	return newimg
 }

@@ -19,9 +19,9 @@ type ImageFileButton struct {
 }
 
 // GetImageForButton is the interface implemention to get the button's image as an image.Image
-func (btn *ImageFileButton) GetImageForButton() image.Image {
+func (btn *ImageFileButton) GetImageForButton(btnSize int) image.Image {
 	// TODO base the 96 on the image bounds
-	newimg := image.NewRGBA(image.Rect(0, 0, 96, 96))
+	newimg := image.NewRGBA(image.Rect(0, 0, btnSize, btnSize))
 	draw.Draw(newimg, newimg.Bounds(), btn.img, image.Point{0, 0}, draw.Src)
 	return newimg
 }
@@ -37,9 +37,9 @@ func (btn *ImageFileButton) GetButtonIndex() int {
 }
 
 // SetFilePath allows the image file to be changed on the fly
-func (btn *ImageFileButton) SetFilePath(filePath string) error {
+func (btn *ImageFileButton) SetFilePath(filePath string, btnSize int) error {
 	btn.filePath = filePath
-	err := btn.loadImage()
+	err := btn.loadImage(btnSize)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (btn *ImageFileButton) SetFilePath(filePath string) error {
 	return nil
 }
 
-func (btn *ImageFileButton) loadImage() error {
+func (btn *ImageFileButton) loadImage(btnSize int) error {
 	f, err := os.Open(btn.filePath)
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func (btn *ImageFileButton) loadImage() error {
 	newimg, ok := img.(*image.RGBA)
 	if !ok {
 		// TODO base the 96 on the button size
-		newimg = image.NewRGBA(image.Rect(0, 0, 96, 96))
+		newimg = image.NewRGBA(image.Rect(0, 0, btnSize, btnSize))
 		draw.Draw(newimg, newimg.Bounds(), img, image.Point{0, 0}, draw.Src)
 	}
 
@@ -91,9 +91,9 @@ func (btn *ImageFileButton) Pressed() {
 }
 
 // NewImageFileButton creates a new ImageFileButton with the specified image on it
-func NewImageFileButton(filePath string) (*ImageFileButton, error) {
+func NewImageFileButton(filePath string, btnSize int) (*ImageFileButton, error) {
 	btn := &ImageFileButton{filePath: filePath}
-	err := btn.loadImage()
+	err := btn.loadImage(btnSize)
 	if err != nil {
 		return nil, err
 	}

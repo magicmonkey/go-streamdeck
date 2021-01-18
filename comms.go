@@ -2,6 +2,7 @@ package streamdeck
 
 import (
 	"errors"
+	"fmt"
 	"image"
 	"image/color"
 
@@ -139,7 +140,7 @@ func (d *Device) ClearButtons() {
 
 // WriteColorToButton writes a specified color to the given button
 func (d *Device) WriteColorToButton(btnIndex int, colour color.Color) error {
-	img := getSolidColourImage(colour)
+	img := getSolidColourImage(colour, d.deviceType.imageSize.X)
 	imgForButton, err := getImageForButton(img, d.deviceType.imageFormat)
 	if err != nil {
 		return err
@@ -199,7 +200,7 @@ func (d *Device) ResetComms() {
 
 // WriteRawImageToButton takes an `image.Image` and writes it to the given button, after resizing and rotating the image to fit the button (for some reason the StreamDeck screens are all upside down)
 func (d *Device) WriteRawImageToButton(btnIndex int, rawImg image.Image) error {
-	img := resizeAndRotate(rawImg, d.deviceType.imageSize.X, d.deviceType.imageSize.Y)
+	img := resizeAndRotate(rawImg, d.deviceType.imageSize.X, d.deviceType.imageSize.Y, d.deviceType.name)
 	imgForButton, err := getImageForButton(img, d.deviceType.imageFormat)
 	if err != nil {
 		return err
@@ -209,11 +210,13 @@ func (d *Device) WriteRawImageToButton(btnIndex int, rawImg image.Image) error {
 
 func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 	// Based on set_key_image from https://github.com/abcminiuser/python-elgato-streamdeck/blob/master/src/StreamDeck/Devices/StreamDeckXL.py#L151
+
+	if Min(Max(btnIndex, 0), int(d.deviceType.numberOfButtons)) != btnIndex {
+		return errors.New(fmt.Sprintf("Invalid key index: %d", btnIndex))
+	}
+
 	pageNumber := 0
 	bytesRemaining := len(rawImage)
-
-	// Surely no image can be more than 20 packets...?
-	payloads := make([][]byte, 20)
 
 	for bytesRemaining > 0 {
 
@@ -236,13 +239,24 @@ func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 
 		thingToSend := append(payload, padding...)
 		d.fd.Write(thingToSend)
-		payloads[pageNumber] = thingToSend
 
 		bytesRemaining = bytesRemaining - thisLength
 		pageNumber = pageNumber + 1
-		if pageNumber >= len(payloads) {
-			return errors.New("Image too big for button comms, aborting - you probably need to reset the Streamdeck at this stage, and modify the size of `payloads` on line 142 to be something bigger")
-		}
 	}
 	return nil
+}
+
+// Golang Min/Max
+func Min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+
+func Max (x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
 }
