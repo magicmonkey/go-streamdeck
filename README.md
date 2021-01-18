@@ -21,12 +21,12 @@ Either include the library in your project or install it with the following comm
 go get github.com/magicmonkey/go-streamdeck
 ```
 
-On Linux, you might also need to add some `udev` rules (this assumes there's a `plugdev` group, like on Debian-based systems, feel free to amend the group to something more appropriate for your system).  Put this into `/etc/udev/rules.d/99-streamdeck.rules`:
+On Linux, you might also need to add some `udev` rules.  Put this into `/etc/udev/rules.d/99-streamdeck.rules`:
 ```
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", MODE:="666", GROUP="plugdev"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", MODE:="666", GROUP="plugdev"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", MODE:="666", GROUP="plugdev"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006d", MODE:="666", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", MODE:="666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0063", MODE:="666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006c", MODE:="666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="006d", MODE:="666"
 ```
 
 ## Usage
