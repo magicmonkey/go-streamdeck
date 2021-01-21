@@ -42,13 +42,25 @@ func init() {
 	xlButtonWidth = 96
 	xlButtonHeight = 96
 	xlImageReportPayloadLength = 1024
+	// Get reset packet from device name
+	reset, err := resetPacket(xlName)
+	if err != nil {
+		panic(err)
+	}
+	// Get brightness packet from device name
+	brightness, err := brightnessPacket(xlName)
+	if err != nil {
+		panic(err)
+	}
 	streamdeck.RegisterDevicetype(
 		xlName, // Name
 		image.Point{X: int(xlButtonWidth), Y: int(xlButtonHeight)}, // Width/height of a button
 		0x6c,                       // USB productID
-		[]byte{'\x03', '\x02'},     // Reset packet
+		reset,                      // Reset packet
 		32,                         // Number of buttons
-		[]byte{'\x03', '\x08'},     // Set brightness packet preamble
+		4,                          // Number of rows
+		8,                          // Number of cols
+		brightness,                 // Set brightness packet preamble
 		4,                          // Button read offset
 		"JPEG",                     // Image format
 		xlImageReportPayloadLength, // Amount of image payload allowed per USB packet
