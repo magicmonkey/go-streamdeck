@@ -25,19 +25,24 @@ func resizeAndRotate(img image.Image, width, height int, devname string) image.I
 
 func deviceSpecifics(devName string, width, height int) (*gift.GIFT, error) {
 	switch devName {
-		case "Streamdeck XL":
-			return gift.New(
-				gift.Resize(width, height, gift.LanczosResampling),
-				gift.Rotate180(),
-			), nil
-		case "Streamdeck Mini":
-			return gift.New(
-				gift.Resize(width, height, gift.LanczosResampling),
-				gift.Rotate90(),
-				gift.FlipVertical(),
-			), nil
-		default:
-			return nil, errors.New(fmt.Sprintf("Unsupported Device: %s", devName))
+	case "Streamdeck XL":
+		return gift.New(
+			gift.Resize(width, height, gift.LanczosResampling),
+			gift.Rotate180(),
+		), nil
+	case "Streamdeck Mini":
+		return gift.New(
+			gift.Resize(width, height, gift.LanczosResampling),
+			gift.Rotate90(),
+			gift.FlipVertical(),
+		), nil
+	case "Streamdeck (original v2)":
+		return gift.New(
+			gift.Resize(width, height, gift.LanczosResampling),
+			gift.Rotate180(),
+		), nil
+	default:
+		return nil, errors.New(fmt.Sprintf("Unsupported Device: %s", devName))
 	}
 }
 
