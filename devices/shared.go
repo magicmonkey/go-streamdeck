@@ -1,51 +1,36 @@
 package devices
 
-import "errors"
-
-func resetPacket(device string) ([]byte, error) {
-	var size int
-	var header []byte
-	
-	switch device {
-	case "Streamdeck XL", "Streamdeck (original v2)":
-		size = 32
-		header = []byte{0x03, 0x02}
-	case "Streamdeck Mini":
-		size = 17
-		header = []byte{0x0b, 0x63}
-	default:
-		return nil, errors.New("Device not supported!")
-	}
-	
-	b := make([]byte, size)
-	b[0] = header[0]
-	b[1] = header[1]
-	return b, nil
+// resetPacket17 gives the reset packet for devices which need it to be 17 bytes long
+func resetPacket17() []byte {
+	pkt := make([]byte, 17)
+	pkt[0] = 0x0b
+	pkt[1] = 0x63
+	return pkt
 }
 
-func brightnessPacket(device string) ([]byte, error) {
-	var size int
-	var header []byte
-
-	switch device {
-	case "Streamdeck XL", "Streamdeck (original v2)":
-		size = 32
-		header = []byte{0x03, 0x08}
-	case "Streamdeck Mini":
-		size = 17
-		header = []byte{0x05, 0x55, 0xaa, 0xd1, 0x01}
-	default:
-		return nil, errors.New("Device is not supported!")
-	}
-
-	b := make([]byte, size)
-	b[0] = header[0]
-	b[1] = header[1]
-	if device == "Streamdeck Mini" {
-		b[2] = header[2]
-		b[3] = header[3]
-		b[4] = header[4]
-	}
-	return b, nil
+// resetPacket32 gives the reset packet for devices which need it to be 32 bytes long
+func resetPacket32() []byte {
+	pkt := make([]byte, 32)
+	pkt[0] = 0x03
+	pkt[1] = 0x02
+	return pkt
 }
 
+// brightnessPacket17 gives the brightness packet for devices which need it to be 17 bytes long
+func brightnessPacket17() []byte {
+	pkt := make([]byte, 17)
+	pkt[0] = 0x05
+	pkt[1] = 0x55
+	pkt[2] = 0xaa
+	pkt[3] = 0xd1
+	pkt[4] = 0x01
+	return pkt
+}
+
+// brightnessPacket32 gives the brightness packet for devices which need it to be 32 bytes long
+func brightnessPacket32() []byte {
+	pkt := make([]byte, 32)
+	pkt[0] = 0x03
+	pkt[1] = 0x08
+	return pkt
+}
