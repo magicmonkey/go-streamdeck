@@ -18,6 +18,8 @@ type deviceType struct {
 	usbProductID        uint16
 	resetPacket         []byte
 	numberOfButtons     uint
+	buttonRows          uint
+	buttonCols          uint
 	brightnessPacket    []byte
 	buttonReadOffset    uint
 	imageFormat         string
@@ -34,6 +36,8 @@ func RegisterDevicetype(
 	usbProductID uint16,
 	resetPacket []byte,
 	numberOfButtons uint,
+	buttonRows uint,
+	buttonCols uint,
 	brightnessPacket []byte,
 	buttonReadOffset uint,
 	imageFormat string,
@@ -46,6 +50,8 @@ func RegisterDevicetype(
 		usbProductID:        usbProductID,
 		resetPacket:         resetPacket,
 		numberOfButtons:     numberOfButtons,
+		buttonRows:          buttonRows,
+		buttonCols:          buttonCols,
 		brightnessPacket:    brightnessPacket,
 		buttonReadOffset:    buttonReadOffset,
 		imageFormat:         imageFormat,

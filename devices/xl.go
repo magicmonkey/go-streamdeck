@@ -46,9 +46,11 @@ func init() {
 		xlName, // Name
 		image.Point{X: int(xlButtonWidth), Y: int(xlButtonHeight)}, // Width/height of a button
 		0x6c,                       // USB productID
-		[]byte{'\x03', '\x02'},     // Reset packet
+		resetPacket32(),            // Reset packet
 		32,                         // Number of buttons
-		[]byte{'\x03', '\x08'},     // Set brightness packet preamble
+		4,                          // Number of rows
+		8,                          // Number of cols
+		brightnessPacket32(),       // Set brightness packet preamble
 		4,                          // Button read offset
 		"JPEG",                     // Image format
 		xlImageReportPayloadLength, // Amount of image payload allowed per USB packet

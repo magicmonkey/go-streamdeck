@@ -46,9 +46,11 @@ func init() {
 		ov2Name, // Name
 		image.Point{X: int(ov2ButtonWidth), Y: int(ov2ButtonHeight)}, // Width/height of a button
 		0x6d,                        // USB productID
-		[]byte{'\x03', '\x02'},      // Reset packet
+		resetPacket32(),             // Reset packet
 		15,                          // Number of buttons
-		[]byte{'\x03', '\x08'},      // Set brightness packet preamble
+		3,                           // Number of rows
+		5,                           // Number of columns
+		brightnessPacket32(),        // Set brightness packet preamble
 		4,                           // Button read offset
 		"JPEG",                      // Image format
 		ov2ImageReportPayloadLength, // Amount of image payload allowed per USB packet
