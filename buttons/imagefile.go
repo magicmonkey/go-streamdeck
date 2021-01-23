@@ -23,7 +23,7 @@ type ImageFileButton struct {
 func (btn *ImageFileButton) GetImageForButton(btnSize int) image.Image {
 	// Resize the image to what the button wants
 	g := gift.New(gift.Resize(btnSize, btnSize, gift.LanczosResampling))
-	newimg := image.NewRGBA(image.Rect(0, 0, btn.img.Bounds().Max.X, btn.img.Bounds().Max.Y))
+	newimg := image.NewRGBA(image.Rect(0, 0, btnSize, btnSize))
 	g.Draw(newimg, btn.img)
 	return newimg
 }
