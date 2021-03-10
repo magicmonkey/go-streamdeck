@@ -132,6 +132,11 @@ func (d *Device) SetBrightness(pct int) {
 	d.fd.SendFeatureReport(payload)
 }
 
+// GetButtonImageSize returns the size of the images to uploaded to the buttons
+func (d* Device) GetButtonImageSize() image.Point {
+	return d.deviceType.imageSize
+}
+
 // ClearButtons writes a black square to all buttons
 func (d *Device) ClearButtons() {
 	numButtons := int(d.deviceType.numberOfButtons)
