@@ -137,6 +137,11 @@ func (d* Device) GetButtonImageSize() image.Point {
 	return d.deviceType.imageSize
 }
 
+// GetNumButtonsOnDevice returns the number of button this device has
+func (d* Device) GetNumButtonsOnDevice() uint {
+	return d.deviceType.numberOfButtons
+}
+
 // ClearButtons writes a black square to all buttons
 func (d *Device) ClearButtons() {
 	numButtons := int(d.deviceType.numberOfButtons)
