@@ -45,7 +45,7 @@ func getImageForButton(img image.Image, btnFormat string) ([]byte, error) {
 	var b bytes.Buffer
 	switch btnFormat {
 	case "JPEG":
-		jpeg.Encode(&b, img, nil)
+		jpeg.Encode(&b, img, &jpeg.Options{Quality: 100})
 	case "BMP":
 		bmp.Encode(&b, img)
 	default:
