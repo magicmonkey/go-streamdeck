@@ -86,29 +86,25 @@ func rawOpen(reset bool) (*Device, error) {
 	}
 
 	retval := &Device{}
-	id := 0
-	found := false
-	// Iterate over the known device types, matching to product ID
-	for _, devType := range deviceTypes {
-		if devices[id].ProductID == devType.usbProductID {
-			retval.deviceType = devType
-			found = true
-			break
+	for _, device := range devices {
+		// Iterate over the known device types, matching to product ID
+		for _, devType := range deviceTypes {
+			if device.ProductID == devType.usbProductID {
+				retval.deviceType = devType
+				dev, err := device.Open()
+				if err != nil {
+					return nil, err
+				}
+				retval.fd = dev
+				if reset {
+					retval.ResetComms()
+				}
+				go retval.buttonPressListener()
+				return retval, nil
+			}
 		}
 	}
-	if !found {
-		return nil, errors.New("Found an Elgato device, but not one for which there is a definition; have you imported the devices package?")
-	}
-	dev, err := devices[id].Open()
-	if err != nil {
-		return nil, err
-	}
-	retval.fd = dev
-	if reset {
-		retval.ResetComms()
-	}
-	go retval.buttonPressListener()
-	return retval, nil
+	return nil, errors.New("Found an Elgato device, but not one for which there is a definition; have you imported the devices package?")
 }
 
 // GetName returns the name of the type of Streamdeck
