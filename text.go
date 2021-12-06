@@ -45,7 +45,7 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 	c.SetClip(dstImg.Bounds())
 
 	x := int((btnSize - width) / 2) // Horizontally centre text
-	y := int(50 + (size / 3))  // Fudged vertical centre, erm, very "heuristic"
+	y := int((float64(btnSize) / 2) + (size / 3)) // Fudged vertical centre, erm, very "heuristic"
 
 	pt := freetype.Pt(x, y)
 	c.DrawString(text, pt)
