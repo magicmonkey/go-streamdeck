@@ -25,19 +25,19 @@ func resizeAndRotate(img image.Image, width, height int, devname string) image.I
 
 func deviceSpecifics(devName string, width, height int) (*gift.GIFT, error) {
 	switch devName {
-		case "Streamdeck XL", "Streamdeck (original v2)":
-			return gift.New(
-				gift.Resize(width, height, gift.LanczosResampling),
-				gift.Rotate180(),
-			), nil
-		case "Streamdeck Mini":
-			return gift.New(
-				gift.Resize(width, height, gift.LanczosResampling),
-				gift.Rotate90(),
-				gift.FlipVertical(),
-			), nil
-		default:
-			return nil, errors.New(fmt.Sprintf("Unsupported Device: %s", devName))
+	case "Streamdeck XL", "Streamdeck (original v2)", "Stream Deck MK.2":
+		return gift.New(
+			gift.Resize(width, height, gift.LanczosResampling),
+			gift.Rotate180(),
+		), nil
+	case "Streamdeck Mini":
+		return gift.New(
+			gift.Resize(width, height, gift.LanczosResampling),
+			gift.Rotate90(),
+			gift.FlipVertical(),
+		), nil
+	default:
+		return nil, errors.New(fmt.Sprintf("Unsupported Device: %s", devName))
 	}
 }
 
@@ -56,7 +56,7 @@ func getImageForButton(img image.Image, btnFormat string) ([]byte, error) {
 
 func getSolidColourImage(colour color.Color, btnSize int) *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, btnSize, btnSize))
-	//colour := color.RGBA{red, green, blue, 0}
+	// colour := color.RGBA{red, green, blue, 0}
 	draw.Draw(img, img.Bounds(), image.NewUniform(colour), image.Point{0, 0}, draw.Src)
 	return img
 }
