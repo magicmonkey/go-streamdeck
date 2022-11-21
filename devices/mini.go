@@ -72,4 +72,18 @@ func init() {
 		miniImageReportPayloadLength, // Amount of image payload allowed per USB packet
 		GetImageHeaderMini,           // Function to get the comms image header
 	)
+	streamdeck.RegisterDevicetype(
+		miniName, // Name
+		image.Point{X: int(miniButtonWidth), Y: int(miniButtonHeight)}, // Width/height of a button
+		0x90,                         // USB productID
+		resetPacket17(),              // Reset packet
+		6,                            // Number of buttons
+		2,                            // Number of rows
+		3,                            // Number of cols
+		brightnessPacket17(),         // Brightness packet
+		1,                            // Button read offset
+		"BMP",                        // Image format
+		miniImageReportPayloadLength, // Amount of image payload allowed per USB packet
+		GetImageHeaderMini,           // Function to get the comms image header
+	)
 }
