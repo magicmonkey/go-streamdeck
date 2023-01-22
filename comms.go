@@ -119,7 +119,7 @@ func (d *Device) Close() {
 
 // SetBrightness sets the button brightness
 // pct is an integer between 0-100
-func (d *Device) SetBrightness(pct int) {
+func (d *Device) SetBrightness(pct int) error {
 	if pct < 0 {
 		pct = 0
 	}
@@ -129,15 +129,33 @@ func (d *Device) SetBrightness(pct int) {
 
 	preamble := d.deviceType.brightnessPacket
 	payload := append(preamble, byte(pct))
-	d.fd.SendFeatureReport(payload)
+	_, err := d.fd.SendFeatureReport(payload)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetButtonImageSize returns the size of the images to uploaded to the buttons
+func (d* Device) GetButtonImageSize() image.Point {
+	return d.deviceType.imageSize
+}
+
+// GetNumButtonsOnDevice returns the number of button this device has
+func (d* Device) GetNumButtonsOnDevice() uint {
+	return d.deviceType.numberOfButtons
 }
 
 // ClearButtons writes a black square to all buttons
-func (d *Device) ClearButtons() {
+func (d *Device) ClearButtons() error {
 	numButtons := int(d.deviceType.numberOfButtons)
 	for i := 0; i < numButtons; i++ {
-		d.WriteColorToButton(i, color.Black)
+		err := d.WriteColorToButton(i, color.Black)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // WriteColorToButton writes a specified color to the given button
@@ -156,7 +174,10 @@ func (d *Device) WriteImageToButton(btnIndex int, filename string) error {
 	if err != nil {
 		return err
 	}
-	d.WriteRawImageToButton(btnIndex, img)
+	err = d.WriteRawImageToButton(btnIndex, img)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -195,9 +216,10 @@ func (d *Device) ButtonPress(f func(int, *Device, error)) {
 }
 
 // ResetComms will reset the comms protocol to the StreamDeck; useful if things have gotten de-synced, but it will also reboot the StreamDeck
-func (d *Device) ResetComms() {
+func (d *Device) ResetComms() error {
 	payload := d.deviceType.resetPacket
-	d.fd.SendFeatureReport(payload)
+	_, err := d.fd.SendFeatureReport(payload)
+	return err
 }
 
 // WriteRawImageToButton takes an `image.Image` and writes it to the given button, after resizing and rotating the image to fit the button (for some reason the StreamDeck screens are all upside down)
@@ -250,7 +272,10 @@ func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 		padding := make([]byte, imageReportLength-len(payload))
 
 		thingToSend := append(payload, padding...)
-		d.fd.Write(thingToSend)
+		_, err := d.fd.Write(thingToSend)
+		if err != nil {
+			return err
+		}
 
 		bytesRemaining = bytesRemaining - thisLength
 		pageNumber = pageNumber + 1
