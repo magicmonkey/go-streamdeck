@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"log"
 
 	"github.com/karalabe/hid"
 )
@@ -230,9 +229,11 @@ func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
 		imageReportHeaderLength := len(header)
 		imageReportPayloadLength := imageReportLength - imageReportHeaderLength
 
-		if halfImage > imageReportPayloadLength {
-			log.Fatalf("image too large: %d", halfImage*2)
-		}
+		/*
+			if halfImage > imageReportPayloadLength {
+				log.Fatalf("image too large: %d", halfImage*2)
+			}
+		*/
 
 		thisLength := 0
 		if imageReportPayloadLength < bytesRemaining {
