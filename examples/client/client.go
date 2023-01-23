@@ -37,7 +37,7 @@ func main() {
 	sd.AddButton(7, myNextButton)
 
 	// Image button, no action handler
-	anotherButton, err := buttons.NewImageFileButton("examples/test/play.jpg")
+	anotherButton, err := buttons.NewImageFileButton("../test/play.jpg")
 	if err != nil {
 		panic(err)
 	}

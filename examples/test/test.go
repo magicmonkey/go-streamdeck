@@ -34,7 +34,7 @@ func main() {
 			panic(err)
 		}
 		sd.ClearButtons()
-		sd.WriteImageToButton(btnIndex, "examples/test/play.jpg")
+		sd.WriteImageToButton(btnIndex, "play.jpg")
 	})
 
 	// keep the program running
