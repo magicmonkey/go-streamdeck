@@ -1,6 +1,9 @@
 package streamdeck
 
-import "image"
+import (
+	"image"
+	"sync"
+)
 
 // ButtonDisplay is the interface to satisfy for displaying on a button
 type ButtonDisplay interface {
@@ -31,6 +34,7 @@ type StreamDeck struct {
 	dev        *Device
 	buttons    map[int]Button
 	decorators map[int]ButtonDecorator
+	mu         sync.Mutex
 }
 
 // New will return a new instance of a `StreamDeck`, and is the main entry point for the higher-level interface.  It will return an error if there is no StreamDeck plugged in.
@@ -56,6 +60,8 @@ func (sd *StreamDeck) GetName() string {
 func (sd *StreamDeck) AddButton(btnIndex int, b Button) {
 	b.RegisterUpdateHandler(sd.ButtonUpdateHandler)
 	b.SetButtonIndex(btnIndex)
+	sd.mu.Lock()
+	defer sd.mu.Unlock()
 	sd.buttons[btnIndex] = b
 	sd.updateButton(b)
 }
