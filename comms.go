@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"sync"
 
 	"github.com/karalabe/hid"
 )
@@ -66,6 +67,7 @@ type Device struct {
 	fd                   *hid.Device
 	deviceType           deviceType
 	buttonPressListeners []func(int, *Device, error)
+	mu                   sync.Mutex // controls access to writing raw data
 }
 
 // Open a Streamdeck device, the most common entry point
@@ -233,6 +235,9 @@ func (d *Device) WriteRawImageToButton(btnIndex int, rawImg image.Image) error {
 }
 
 func (d *Device) rawWriteToButton(btnIndex int, rawImage []byte) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
 	// Based on set_key_image from https://github.com/abcminiuser/python-elgato-streamdeck/blob/master/src/StreamDeck/Devices/StreamDeckXL.py#L151
 
 	if Min(Max(btnIndex, 0), int(d.deviceType.numberOfButtons)) != btnIndex {
