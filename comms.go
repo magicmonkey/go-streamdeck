@@ -139,12 +139,12 @@ func (d *Device) SetBrightness(pct int) error {
 }
 
 // GetButtonImageSize returns the size of the images to uploaded to the buttons
-func (d* Device) GetButtonImageSize() image.Point {
+func (d *Device) GetButtonImageSize() image.Point {
 	return d.deviceType.imageSize
 }
 
 // GetNumButtonsOnDevice returns the number of button this device has
-func (d* Device) GetNumButtonsOnDevice() uint {
+func (d *Device) GetNumButtonsOnDevice() uint {
 	return d.deviceType.numberOfButtons
 }
 
