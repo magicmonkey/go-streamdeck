@@ -104,7 +104,7 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 	width := 0
 	for size = 1; size < 60; size++ {
 		width = getTextWidth(text, size)
-		if width > btnSize {
+		if width >= btnSize {
 			size = size - 1
 			break
 		}
