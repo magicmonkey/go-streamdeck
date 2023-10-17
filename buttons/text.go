@@ -20,11 +20,12 @@ type TextButton struct {
 	updateHandler    func(streamdeck.Button)
 	btnIndex         int
 	actionHandler    streamdeck.ButtonActionHandler
+	margin           int
 }
 
 // GetImageForButton is the interface implemention to get the button's image as an image.Image
 func (btn *TextButton) GetImageForButton(btnSize int) image.Image {
-	img := getImageWithText(btn.label, btn.textColour, btn.backgroundColour, btnSize)
+	img := getImageWithText(btn.label, btn.textColour, btn.backgroundColour, btnSize, btn.margin)
 	return img
 }
 
@@ -80,7 +81,15 @@ func (btn *TextButton) Pressed() {
 // background.  The text will be set on a single line, and auto-sized to fill the button as best
 // as possible.
 func NewTextButton(label string) *TextButton {
-	btn := NewTextButtonWithColours(label, color.White, color.Black)
+	btn := NewTextButtonWithColoursAndMargin(label, color.White, color.Black, 6)
+	return btn
+}
+
+// NewTextButtonWithMargin creates a new TextButton with the specified text on it, in white on a
+// black background.  The text will be set on a single line, and auto-sized to fill the button as
+// best as possible, taking into account the margin on each side.
+func NewTextButtonWithMargin(label string, margin int) *TextButton {
+	btn := NewTextButtonWithColoursAndMargin(label, color.White, color.Black, margin)
 	return btn
 }
 
@@ -88,11 +97,20 @@ func NewTextButton(label string) *TextButton {
 // text and background colours.  The text will be set on a single line, and auto-sized to fill the
 // button as best as possible.
 func NewTextButtonWithColours(label string, textColour color.Color, backgroundColour color.Color) *TextButton {
-	btn := &TextButton{label: label, textColour: textColour, backgroundColour: backgroundColour}
+	btn := NewTextButtonWithColoursAndMargin(label, textColour, backgroundColour, 6)
 	return btn
 }
 
-func getImageWithText(text string, textColour color.Color, backgroundColour color.Color, btnSize int) image.Image {
+// NewTextButtonWithColoursAndMargin creates a new TextButton with the specified text on it, in the
+// specified text and background colours.  The text will be set on a single line, and auto-sized to
+// fill the button as best as possible, taking into account the margin on each side.
+func NewTextButtonWithColoursAndMargin(label string, textColour color.Color, backgroundColour color.Color, margin int) *TextButton {
+	btn := &TextButton{label: label, textColour: textColour, backgroundColour: backgroundColour, margin: margin}
+	return btn
+}
+
+
+func getImageWithText(text string, textColour color.Color, backgroundColour color.Color, btnSize int, margin int) image.Image {
 
 	size := float64(18)
 
@@ -104,7 +122,7 @@ func getImageWithText(text string, textColour color.Color, backgroundColour colo
 	width := 0
 	for size = 1; size < 60; size++ {
 		width = getTextWidth(text, size)
-		if width >= btnSize {
+		if width >= btnSize - (margin * 2) {
 			size = size - 1
 			break
 		}
