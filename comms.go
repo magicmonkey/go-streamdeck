@@ -63,9 +63,10 @@ func RegisterDevicetype(
 
 // Device is a struct which represents an actual Streamdeck device, and holds its reference to the USB HID device
 type Device struct {
-	fd                   *hid.Device
-	deviceType           deviceType
-	buttonPressListeners []func(int, *Device, error)
+	fd                     *hid.Device
+	deviceType             deviceType
+	buttonPressListeners   []func(int, *Device, error)
+	buttonReleaseListeners []func(int, *Device, error)
 }
 
 // Open a Streamdeck device, the most common entry point
@@ -137,12 +138,12 @@ func (d *Device) SetBrightness(pct int) error {
 }
 
 // GetButtonImageSize returns the size of the images to uploaded to the buttons
-func (d* Device) GetButtonImageSize() image.Point {
+func (d *Device) GetButtonImageSize() image.Point {
 	return d.deviceType.imageSize
 }
 
 // GetNumButtonsOnDevice returns the number of button this device has
-func (d* Device) GetNumButtonsOnDevice() uint {
+func (d *Device) GetNumButtonsOnDevice() uint {
 	return d.deviceType.numberOfButtons
 }
 
@@ -198,6 +199,9 @@ func (d *Device) buttonPressListener() {
 				}
 				buttonMask[i] = true
 			} else {
+				if buttonMask[i] {
+					d.sendButtonReleaseEvent(int(i), nil)
+				}
 				buttonMask[i] = false
 			}
 		}
@@ -210,9 +214,20 @@ func (d *Device) sendButtonPressEvent(btnIndex int, err error) {
 	}
 }
 
+func (d *Device) sendButtonReleaseEvent(btnIndex int, err error) {
+	for _, f := range d.buttonReleaseListeners {
+		f(btnIndex, d, err)
+	}
+}
+
 // ButtonPress registers a callback to be called whenever a button is pressed
 func (d *Device) ButtonPress(f func(int, *Device, error)) {
 	d.buttonPressListeners = append(d.buttonPressListeners, f)
+}
+
+// ButtonRelease registers a callback to be called whenever a button is released
+func (d *Device) ButtonRelease(f func(int, *Device, error)) {
+	d.buttonReleaseListeners = append(d.buttonReleaseListeners, f)
 }
 
 // ResetComms will reset the comms protocol to the StreamDeck; useful if things have gotten de-synced, but it will also reboot the StreamDeck
